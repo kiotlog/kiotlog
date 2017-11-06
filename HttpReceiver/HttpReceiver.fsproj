@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="src/Utils.fs" />
+    <Compile Include="src/Catalog.fs" />
+    <Compile Include="src/CliArguments.fs" />
+    <Compile Include="src/Data.fs" />
+    <Compile Include="src/MQTT.fs" />
+    <Compile Include="src/WebParts.fs" />
+    <Compile Include="src/Program.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Dockerfile" />
+    <Content Include="nuget.config" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="Argu" Version="3.7.0" />
+    <PackageReference Include="Chessie" Version="0.6.0" />
+    <PackageReference Include="ILLink.Tasks" Version="0.1.4-preview-981901" />
+    <PackageReference Include="M2MqttDotNetCore" Version="1.0.7" />
+    <PackageReference Include="Newtonsoft.JSON" Version="10.0.3" />
+    <PackageReference Include="Suave" Version="2.2.1" />
+  
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,26 @@
+version: "3"
+
+services:
+  sfhr:
+    build: .
+    image: kiotlog/sfhr:alpine
+    ports:
+      - "8080:8080"
+    networks:
+      kiotlog:
+        aliases:
+          - sfhr
+
+  mosquitto:
+    image: eclipse-mosquitto
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+    networks:
+      kiotlog:
+        aliases:
+          - mqtt
+
+
+networks:
+  kiotlog:

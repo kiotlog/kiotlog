@@ -1,0 +1,73 @@
+version: "3"
+
+networks:
+  ttn:
+
+services:
+  nodered:
+    image: nodered/node-red-docker
+    volumes: 
+    - /var/lib/nodered/data:/data
+    - /var/lib/nodered/node_flows.json:/data/flows.json
+    - /var/lib/nodered/node_settings.js:/data/settings.js
+    networks:
+      ttn:
+        aliases:
+        - mynodered
+    ports:
+    - "1880:1880"
+  
+  influxdb:
+    image: influxdb:alpine
+    volumes:
+    - /var/lib/influxdb:/var/lib/influxdb
+    environment:
+    - INFLUXDB_ADMIN_ENABLED=false
+    networks:
+      ttn:
+        aliases:
+        - influxdb
+    ports:
+    # - "8083:8083"
+    - "127.0.0.1:8086:8086"
+
+  grafana:
+    image: grafana/grafana
+    volumes:
+    - /var/lib/grafana:/var/lib/grafana
+    networks:
+      ttn:
+        aliases:
+        - grafana
+    ports:
+    - "3000:3000"
+
+  emqtt:
+    image: emqttd-docker-v2.3-rc.2
+    volumes:
+      - /var/lib/emqttd/etc:/opt/emqttd/etc
+      - /var/lib/emqttd/data:/opt/emqttd/data
+    networks:
+      ttn:
+        aliases:
+          - emqtt
+    ports:
+      - "1883:1883"
+      - "8083:8083"
+      - "8883:8883"
+      - "8084:8084"
+      - "18083:18083"
+      - "2883:2883/udp"
+
+  postgres:
+    build: ./postgres
+    image: kiotlog/postgres
+    networks:
+      ttn:
+        aliases:
+          - kldb
+          - postgres
+    ports:
+      - 127.0.0.1:7432:5432
+    volumes:
+      - ./srv/lib/postgresql/10:/var/lib/postgresql/data

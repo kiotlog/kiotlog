@@ -1,0 +1,5 @@
+bin/
+obj/
+garage/
+out/
+.*ignore
