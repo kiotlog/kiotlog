@@ -151,6 +151,14 @@ ALTER TABLE ONLY devices
 
 
 --
+-- Name: devices devices_device_key; Type: CONSTRAINT; Schema: public; Owner: kl_writers
+--
+
+ALTER TABLE ONLY devices
+    ADD CONSTRAINT devices_device_key UNIQUE (device);
+
+
+--
 -- Name: devices devices_pkey; Type: CONSTRAINT; Schema: public; Owner: kl_writers
 --
 
