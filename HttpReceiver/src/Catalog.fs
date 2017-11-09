@@ -8,12 +8,10 @@ module Catalog =
     let [<Literal>] DeviceAuthSample = """ { "basic": {"token": "friendlytoken"}} """
     type DeviceAuth = JsonProvider<DeviceAuthSample>
 
-    // let runtimeConnString = @"User ID=kl_httprecv;Host=postgres;Port=5432;Database=trmpln;Password=KlHttpr3cv"
-    // type Sql = SqlDataProvider<DbVendor, ConnString, ResolutionPath = ResolutionPath, IndivAmount, UseOptTypes>
     type Sql =
         SqlDataProvider<
             DatabaseVendor = Common.DatabaseProviderTypes.POSTGRESQL,
-            ConnectionString = @"User ID=kl_httprecv;Host=localhost;Port=7432;Database=trmpln;Password=KlHttpr3cv",
+            ConnectionString = @"User ID=kl_grafana;Password=KlGr4f4n4;Host=localhost;Port=7432;Database=trmpln",
             ResolutionPath = @"dlls",
             IndividualsAmount = 1000,
             UseOptionTypes = true,
@@ -25,9 +23,7 @@ module Catalog =
         let runtimeConnString =
             sprintf "Host=%s;Port=%d;User ID=%s;Password=%s;Database=%s" host port user pass db
         
-        printfn "Connecting to: %s" runtimeConnString
-
-        let ctx = Sql.GetDataContext(connectionString = runtimeConnString, resolutionPath = ".")
+        let ctx = Sql.GetDataContext runtimeConnString
     
         let devices =
             query {
