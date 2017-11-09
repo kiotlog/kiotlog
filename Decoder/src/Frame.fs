@@ -1,7 +1,7 @@
 module Trmpln.Frame
 
 open FSharp.Data
-open Trmpln.Units
+open Units
 
 type TTNFrame = JsonProvider<""" {
     "app_id":"trmpln-test",

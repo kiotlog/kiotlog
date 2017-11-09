@@ -6,20 +6,18 @@ open System.Collections.Generic
 
 open uPLibrary.Networking.M2Mqtt
 open uPLibrary.Networking.M2Mqtt.Messages
-open uPLibrary.Networking.M2Mqtt.Session
-open uPLibrary.Networking.M2Mqtt.Internal
+// open uPLibrary.Networking.M2Mqtt.Session
+// open uPLibrary.Networking.M2Mqtt.Internal
 open uPLibrary.Networking.M2Mqtt.Exceptions
 
-open Trmpln.Frame
-open Trmpln.Struct
-open Trmpln.Units
-open Trmpln.Helpers
+open Frame
+open Struct
+open Units
+open Helpers
 
 open NGeoHash
 
-open InfluxData.Net.InfluxDb
-open InfluxData.Net.Common.Enums
-open InfluxData.Net.InfluxDb.Models
+// open InfluxData.Net.InfluxDb.Models
 
 // let msgReceivedHandler (i: InfluxDbClient) (e: MqttMsgPublishEventArgs) =
 let msgReceivedHandler _ (e: MqttMsgPublishEventArgs) =
@@ -64,11 +62,11 @@ let msgReceivedHandler _ (e: MqttMsgPublishEventArgs) =
     fields.["Temperature"] <- convertdCToC << todCelsius <| payload.[2].ToFloat()
     fields.["Pressure"] <- convertdaPaTohPa << todaPascal  <| payload.[3].ToFloat()
 
-    let point = Point()
-    point.Name <- "lopy"
-    point.Tags <- tags
-    point.Fields <- fields
-    point.Timestamp <- Nullable msg.Metadata.Time
+    // let point = Point()
+    // point.Name <- "lopy"
+    // point.Tags <- tags
+    // point.Fields <- fields
+    // point.Timestamp <- Nullable msg.Metadata.Time
 
     // async {
     //     let! response = i.Client.WriteAsync(point, "ostriot") |> Async.AwaitTask
