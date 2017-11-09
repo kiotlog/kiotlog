@@ -55,8 +55,8 @@
   </Target>
   <Target Name="CopyLibrariesNonWin">
     <Exec Command="mkdir -p temp" />
-    <Exec Command="cp ${HOME}/.nuget/packages/npgsql/3.1.0/lib/net451/Npgsql.dll temp/ " />
-    <Exec Command="cp ${HOME}/.nuget/packages/System.Threading.Tasks.Extensions/4.4.0/lib/portable-net45+win8+wp8+wpa81/System.Threading.Tasks.Extensions.dll temp/ " />
+    <Exec Command="cp dlls/Npgsql.dll temp/ " />
+    <Exec Command="cp dlls/System.Threading.Tasks.Extensions.dll temp/ " />
   </Target>
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
     <CallTarget Targets="CopyLibrariesWin" Condition="'$(IsWindows)' == 'true'" />
