@@ -5,6 +5,7 @@ open Operators
 open Filters
 
 open Catalog
+open HttpAuth
 open WebParts
 open MQTT
 open CliArguments
@@ -41,6 +42,9 @@ let main argv =
                     fromSigFoxPart
             ]
         ]
+    
+    let checkToken =
+        checkToken (getDeviceBasicAuth mainConfig.Postgres)
 
     let app =
         Authentication.authenticateBasic

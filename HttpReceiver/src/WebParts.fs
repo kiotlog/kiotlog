@@ -1,9 +1,9 @@
 namespace HttpReceiver
 
 open Suave
-open Suave.Successful
+open Successful
 
-open HttpReceiver.MQTT
+open MQTT
 
 module WebParts =
 
