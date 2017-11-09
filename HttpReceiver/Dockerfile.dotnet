@@ -19,3 +19,4 @@ COPY --from=build-env /app/out ./
 COPY runtimeconfig.json ./HttpReceiver.runtimeconfig.json
 ENTRYPOINT ["./HttpReceiver"]
 
+# ./HttpReceiver --host 0.0.0.0 --mqttbroker emqtt 1883 --postgres postgres 5432 kl_grafana KlGr4f4n4 trmpln
