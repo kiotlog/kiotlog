@@ -5,4 +5,4 @@ libsodium-net
 **/bin
 **/obj
 **/srv
-**/out
+**/out*
