@@ -16,8 +16,6 @@ open KiotlogDB
 let main argv =
     let mainConfig = parseCLI argv
 
-    let ctx = new KiotlogDBContext(mainConfig.PostgresConnectionString)
-
     let mqttPublish =
         mainConfig.MQTTBroker
         |> mqttConnect
@@ -47,7 +45,7 @@ let main argv =
         ]
     
     let checkToken =
-        checkToken (getDeviceBasicAuth ctx)
+        checkToken (getDeviceBasicAuth mainConfig.PostgresConnectionString)
 
     let app =
         Authentication.authenticateBasic

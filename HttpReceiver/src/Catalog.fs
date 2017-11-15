@@ -21,7 +21,9 @@ module Catalog =
 
     open Authorization
 
-    let getDeviceBasicAuth (ctx: KiotlogDBContext) devid tkn =
+    let getDeviceBasicAuth connectionString devid tkn =
+
+        use ctx = new KiotlogDBContext(connectionString)
     
         let devices =
             query {
