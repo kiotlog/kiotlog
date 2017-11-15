@@ -1,6 +1,5 @@
 namespace HttpReceiver
 
-open Microsoft.EntityFrameworkCore
 open Microsoft.FSharpLu.Json
 
 open KiotlogDB
