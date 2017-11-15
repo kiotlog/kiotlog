@@ -6,18 +6,24 @@ namespace KiotlogDB
 {
     public partial class trmplnContext : DbContext
     {
+        private string ConnectionString;
+
         public virtual DbSet<Conversions> Conversions { get; set; }
         public virtual DbSet<Devices> Devices { get; set; }
         public virtual DbSet<Points> Points { get; set; }
         public virtual DbSet<Sensors> Sensors { get; set; }
         public virtual DbSet<SensorTypes> SensorTypes { get; set; }
 
+        public trmplnContext(string connectionString)
+        {
+            ConnectionString = connectionString;
+        }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
             {
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseNpgsql(@"Username=postgres;Host=localhost;Port=5432;Database=trmpln");
+                optionsBuilder.UseNpgsql(ConnectionString);
             }
         }
 
