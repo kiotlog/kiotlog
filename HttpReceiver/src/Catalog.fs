@@ -1,38 +1,35 @@
 namespace HttpReceiver
 
-open FSharp.Data.Sql
-open FSharp.Data
+open KiotlogDB
+open Microsoft.FSharpLu.Json
+
+module Authorization =
+
+    type BasicAuth =
+        {
+            Token: string
+        }
+
+    type Auth =
+        {
+            Basic: BasicAuth
+        }
 
 module Catalog =
 
-    let [<Literal>] DeviceAuthSample = """ { "basic": {"token": "friendlytoken"}} """
-    type DeviceAuth = JsonProvider<DeviceAuthSample>
+    open Authorization
 
-    type Sql =
-        SqlDataProvider<
-            DatabaseVendor = Common.DatabaseProviderTypes.POSTGRESQL,
-            ConnectionString = @"User ID=kl_grafana;Password=KlGr4f4n4;Host=localhost;Port=7432;Database=trmpln",
-            ResolutionPath = @"dlls",
-            IndividualsAmount = 1000,
-            UseOptionTypes = true,
-            Owner = @"public">
-
-
-    let getDeviceBasicAuth (host, port, user, pass, db) devid tkn =
-    
-        let runtimeConnString =
-            sprintf "Host=%s;Port=%d;User ID=%s;Password=%s;Database=%s" host port user pass db
-        
-        let ctx = Sql.GetDataContext runtimeConnString
+    let getDeviceBasicAuth (ctx: trmplnContext) devid tkn =
     
         let devices =
             query {
-                for d in ctx.Public.Devices do  
+                for d in ctx.Devices do  
                 where (d.Device = devid)
-                select (d.Device, DeviceAuth.Parse d.Auth)
+                select (d.Device, d.Auth)
             } |> Seq.toArray
         
-        let checkBasicAuth (device, auth: JsonProvider<DeviceAuthSample>.Root) =
+        let checkBasicAuth (device, auth) =
+            let auth : Auth = Default.deserialize auth
             device = devid && auth.Basic.Token = tkn
         
         devices |> Seq.tryFind checkBasicAuth

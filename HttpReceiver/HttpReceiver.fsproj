@@ -4,8 +4,6 @@
     <TargetFramework>netcoreapp2.0</TargetFramework>
   </PropertyGroup>
 
-  <Import Project="fsc.props" />
-  
   <ItemGroup>
     <Compile Include="src/Utils.fs" />
     <Compile Include="src/Catalog.fs" />
@@ -23,43 +21,19 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Condition="'$(IsWindows)' != 'true'" Include="FSharp.Data.SqlProvider">
-      <HintPath>dlls/FSharp.Data.SqlProvider.dll</HintPath>
-    </Reference>
+    <PackageReference Include="Argu" Version="3.7.0" />
+    <PackageReference Include="Chessie" Version="0.6.0" />
+    <PackageReference Include="ILLink.Tasks" Version="0.1.4-preview-981901" />
+    <PackageReference Include="M2MqttDotNetCore" Version="1.0.7" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.0.1" />
+    <PackageReference Include="Microsoft.FSharpLu.Json" Version="0.10.3" />
+    <PackageReference Include="Newtonsoft.JSON" Version="10.0.3" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="2.0.0" />
+    <PackageReference Include="Suave" Version="2.2.1" />
   </ItemGroup>
   
   <ItemGroup>
-    <PackageReference Include="Argu" Version="3.7.0" />
-    <PackageReference Include="Chessie" Version="0.6.0" />
-    <PackageReference Include="FSharp.Data" Version="2.4.2" />
-    <!-- <PackageReference Include="ILLink.Tasks" Version="0.1.4-preview-981901" /> -->
-    <PackageReference Include="M2MqttDotNetCore" Version="1.0.7" />
-    <PackageReference Include="Newtonsoft.JSON" Version="10.0.3" />
-    <PackageReference Include="npgsql" Version="3.1.0" />
-    <PackageReference Include="Suave" Version="2.2.1" />
-    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="15.3.409" />
-    <PackageReference Include="System.Console" Version="4.3.0" />
-    <PackageReference Include="System.Data.Common" Version="4.3.0" />
-    <!-- <PackageReference Include="System.Data.Odbc" Version="4.5.0-preview1-25726-06" /> -->
-    <PackageReference Include="System.Runtime" Version="4.3.0" />
-    <PackageReference Include="System.Runtime.Extensions" Version="4.3.0" />
-    <PackageReference Include="System.Reflection" Version="4.3.0" />
-    <PackageReference Include="System.Reflection.TypeExtensions" Version="4.4.0" />
-    <PackageReference Include="System.Runtime.Serialization.Formatters" Version="4.3.0" />
-    <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.4.0" />
+    <ProjectReference Include="..\KiotlogDB\KiotlogDB.csproj" />
   </ItemGroup>
-  <Target Name="CopyLibrariesWin">
-    <Exec Command="xcopy ..\..\..\packages\scripts\Npgsql\lib\netstandard2.0\Npgsql.dll temp\ /y" />
-    <Exec Command="xcopy ..\..\..\packages\scripts\System.Threading.Tasks.Extensions\lib\netstandard2.0\System.Threading.Tasks.Extensions.dll temp\ /y" />
-    <Exec Command="xcopy ..\..\..\packages\System.Data.Common\lib\netstandard1.2\System.Data.Common.dll temp\ /y" />
-  </Target>
-  <Target Name="CopyLibrariesNonWin">
-    <Exec Command="mkdir -p temp" />
-    <Exec Command="cp dlls/Npgsql.dll temp/ " />
-    <Exec Command="cp dlls/System.Threading.Tasks.Extensions.dll temp/ " />
-  </Target>
-  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-    <CallTarget Targets="CopyLibrariesWin" Condition="'$(IsWindows)' == 'true'" />
-    <CallTarget Targets="CopyLibrariesNonWin" Condition="'$(IsWindows)' != 'true'" />
-  </Target>  
+
 </Project>

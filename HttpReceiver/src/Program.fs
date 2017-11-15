@@ -10,10 +10,13 @@ open WebParts
 open MQTT
 open CliArguments
 open Helpers
+open KiotlogDB
 
 [<EntryPoint>]
 let main argv =
     let mainConfig = parseCLI argv
+
+    use ctx = new trmplnContext()
 
     let mqttPublish =
         mainConfig.MQTTBroker
@@ -44,7 +47,7 @@ let main argv =
         ]
     
     let checkToken =
-        checkToken (getDeviceBasicAuth mainConfig.Postgres)
+        checkToken (getDeviceBasicAuth ctx)
 
     let app =
         Authentication.authenticateBasic
