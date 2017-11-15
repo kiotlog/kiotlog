@@ -10,7 +10,6 @@ open WebParts
 open MQTT
 open CliArguments
 open Helpers
-open KiotlogDB
 
 [<EntryPoint>]
 let main argv =
