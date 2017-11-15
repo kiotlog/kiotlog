@@ -16,7 +16,7 @@ open KiotlogDB
 let main argv =
     let mainConfig = parseCLI argv
 
-    let ctx = new trmplnContext(mainConfig.PostgresConnectionString)
+    let ctx = new KiotlogDBContext(mainConfig.PostgresConnectionString)
 
     let mqttPublish =
         mainConfig.MQTTBroker

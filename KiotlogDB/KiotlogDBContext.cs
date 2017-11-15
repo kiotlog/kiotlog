@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace KiotlogDB
 {
-    public partial class trmplnContext : DbContext
+    public partial class KiotlogDBContext : DbContext
     {
         private string ConnectionString;
 
@@ -14,7 +14,7 @@ namespace KiotlogDB
         public virtual DbSet<Sensors> Sensors { get; set; }
         public virtual DbSet<SensorTypes> SensorTypes { get; set; }
 
-        public trmplnContext(string connectionString)
+        public KiotlogDBContext(string connectionString)
         {
             ConnectionString = connectionString;
         }

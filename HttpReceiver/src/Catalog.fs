@@ -1,7 +1,10 @@
 namespace HttpReceiver
 
-open KiotlogDB
+open Microsoft.EntityFrameworkCore
 open Microsoft.FSharpLu.Json
+
+open KiotlogDB
+
 
 module Authorization =
 
@@ -19,7 +22,7 @@ module Catalog =
 
     open Authorization
 
-    let getDeviceBasicAuth (ctx: trmplnContext) devid tkn =
+    let getDeviceBasicAuth (ctx: KiotlogDBContext) devid tkn =
     
         let devices =
             query {
