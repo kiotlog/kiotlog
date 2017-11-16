@@ -16,16 +16,16 @@ namespace KiotlogDB
 
         public class JsonBAuth
         {
-            public BasicAuth Basic {get; set;}
+            public BasicAuth Basic { get; set; }
             public class BasicAuth {
-                public string Token {get; set;}
+                public string Token { get; set; }
             }
         }
 
         public class JsonBFrame
         {
-            public string Bigendian {get; set;}
-            public string Bitfields {get; set;}
+            public string Bigendian { get; set; }
+            public string Bitfields { get; set; }
         }
 
         public Guid Id { get; set; }
