@@ -65,7 +65,8 @@ namespace KiotlogDB
                     .HasColumnName("id")
                     .HasDefaultValueSql("gen_random_uuid()");
 
-                entity.Property(e => e.Auth)
+                // entity.Ignore(d => d.Auth);
+                entity.Property(e => e._Auth)
                     .IsRequired()
                     .HasColumnName("auth")
                     .HasColumnType("jsonb")
@@ -75,12 +76,12 @@ namespace KiotlogDB
                     .IsRequired()
                     .HasColumnName("device");
 
-                entity.Property(e => e.Frame)
+                entity.Property(e => e._Frame)
                     .IsRequired()
                     .HasColumnName("frame")
                     .HasColumnType("jsonb")
                     .HasDefaultValueSql("'{\"bigendian\": true, \"bitfields\": false}'::jsonb");
-
+                
                 entity.Property(e => e.Meta)
                     .IsRequired()
                     .HasColumnName("meta")
