@@ -26,7 +26,6 @@
     <PackageReference Include="ILLink.Tasks" Version="0.1.4-preview-981901" />
     <PackageReference Include="M2MqttDotNetCore" Version="1.0.7" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.0.1" />
-    <PackageReference Include="Microsoft.FSharpLu.Json" Version="0.10.3" />
     <PackageReference Include="Newtonsoft.JSON" Version="10.0.3" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="2.0.0" />
     <PackageReference Include="Suave" Version="2.2.1" />
