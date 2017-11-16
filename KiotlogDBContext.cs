@@ -65,7 +65,6 @@ namespace KiotlogDB
                     .HasColumnName("id")
                     .HasDefaultValueSql("gen_random_uuid()");
 
-                // entity.Ignore(d => d.Auth);
                 entity.Property(e => e._Auth)
                     .IsRequired()
                     .HasColumnName("auth")
