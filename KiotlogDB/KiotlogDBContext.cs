@@ -141,13 +141,13 @@ namespace KiotlogDB
 
                 entity.Property(e => e.DeviceId).HasColumnName("device_id");
 
-                entity.Property(e => e.Fmt)
+                entity.Property(e => e._Fmt)
                     .IsRequired()
                     .HasColumnName("fmt")
                     .HasColumnType("jsonb")
                     .HasDefaultValueSql("'{}'::jsonb");
 
-                entity.Property(e => e.Meta)
+                entity.Property(e => e._Meta)
                     .IsRequired()
                     .HasColumnName("meta")
                     .HasColumnType("jsonb")
@@ -188,7 +188,7 @@ namespace KiotlogDB
                     .HasColumnName("id")
                     .HasDefaultValueSql("gen_random_uuid()");
 
-                entity.Property(e => e.Meta)
+                entity.Property(e => e._Meta)
                     .HasColumnName("meta")
                     .HasColumnType("jsonb")
                     .HasDefaultValueSql("'{}'::jsonb");
