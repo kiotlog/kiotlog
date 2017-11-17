@@ -24,7 +24,7 @@ namespace KiotlogDB
 
         public class JsonBFrame
         {
-            public string Bigendian { get; set; }
+            public bool Bigendian { get; set; }
             public string Bitfields { get; set; }
         }
 
