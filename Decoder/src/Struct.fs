@@ -1,4 +1,4 @@
-namespace Trmpln
+namespace Decoder
 
 open System
 open System.IO

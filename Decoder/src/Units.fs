@@ -1,4 +1,4 @@
-module Trmpln.Units
+module Decoder.Units
 
 [<Measure>] type V
 [<Measure>] type mV

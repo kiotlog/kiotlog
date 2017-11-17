@@ -1,45 +1,29 @@
-module Trmpln.OstriotCli
+module Decoder.Program
 
-open System
 open System.Threading
 
-open FSharp.Data
-
-open uPLibrary.Networking.M2Mqtt
+// open uPLibrary.Networking.M2Mqtt
 open uPLibrary.Networking.M2Mqtt.Messages
 
-open InfluxData.Net.InfluxDb
-open InfluxData.Net.Common.Enums
-
-open Trmpln.Arguments
-open Trmpln.Struct
-open Trmpln.Frame
-open Trmpln.Units
-open Trmpln.Mqtt
+open Arguments
+open Mqtt
 
 [<EntryPoint>]
 let main argv =
-    let mc = parseCLI argv
+    let mainConfig = parseCLI argv
 
-    let influxclient =
-        InfluxDbClient
-            (mc.HostInfluxDB, mc.UserInfluxDB, mc.PassInfluxDB, InfluxDbVersion.v_1_0_0)
+    let mqttTopics, mqttQosLevels =
+        mainConfig.Topics |> List.toArray,
+        [| for _ in mainConfig.Topics -> MqttMsgBase.QOS_LEVEL_AT_MOST_ONCE |]
 
-    let ttnClient, ttnConnectionParams, ttnTopics, ttnQosLevels =
-        MqttClient (brokerHostName = mc.BrokerMQTT), 
-        ("ostriotcli/" + Guid.NewGuid().ToString(), mc.UserMQTT, mc.PassMQTT, false, 60us), 
-        [| for ln in mc.LoraNodes -> "+/devices/" + ln + "/up" |], 
-        [| for _ in mc.LoraNodes -> MqttMsgBase.QOS_LEVEL_AT_MOST_ONCE |]
+    let mqttClient = mqttConnect mainConfig.MQTTBroker
 
-    let msgReceived = msgReceivedHandler influxclient
-    let connectionClosed = connectionClosedHandler ttnClient ttnConnectionParams
+    let msgReceived = msgReceivedHandler mainConfig.PostgresConnectionString
 
-    ttnClient.MqttMsgPublishReceived.Add msgReceived
-    ttnClient.MqttMsgSubscribed.Add msgSubscribed
-    ttnClient.ConnectionClosed.Add connectionClosed
-
-    mqttConnect ttnClient ttnConnectionParams |> ignore
-    ttnClient.Subscribe (ttnTopics, ttnQosLevels) |> ignore
+    mqttClient.MqttMsgPublishReceived.Add msgReceived
+    mqttClient.MqttMsgSubscribed.Add msgSubscribed
+    
+    mqttClient.Subscribe (mqttTopics, mqttQosLevels) |> ignore
 
     Thread.Sleep Timeout.Infinite
 

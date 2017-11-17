@@ -1,45 +1,33 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.0</TargetFramework>
   </PropertyGroup>
-  <PropertyGroup>
-    <IsWindows Condition="'$(OS)' == 'Windows_NT'">true</IsWindows>
-    <IsOSX Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))' == 'true'">true</IsOSX>
-    <IsLinux Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))' == 'true'">true</IsLinux>
-  </PropertyGroup>  
-  <PropertyGroup Condition="'$(IsWindows)' == 'true'">
-    <FscToolPath>C:\Program Files (x86)\Microsoft SDKs\F#\4.1\Framework\v4.0</FscToolPath>
-    <FscToolExe>fsc.exe</FscToolExe>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(IsOSX)' == 'true'">
-    <FscToolPath>/Library/Frameworks/Mono.framework/Versions/Current/Commands</FscToolPath>
-    <FscToolExe>fsharpc</FscToolExe>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(IsLinux)' == 'true'">
-    <FscToolPath>/usr/bin</FscToolPath>
-    <FscToolExe>fsharpc</FscToolExe>
-  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\KiotlogDB\KiotlogDB.csproj" />
+  </ItemGroup>
   <ItemGroup>
     <Compile Include="src/Helpers.fs" />
     <Compile Include="src/Units.fs" />
-    <Compile Include="src/Frame.fs" />
+    <Compile Include="src/Body.fs" />
     <Compile Include="src/Struct.fs" />
+    <Compile Include="src/Catalog.fs" />
+    <Compile Include="src/Decoder.fs" />
     <Compile Include="src/Mqtt.fs" />
     <Compile Include="src/Arguments.fs" />
     <Compile Include="src/Program.fs" />
+    <Content Include="nuget.config" />
+    <Content Include="runtimeconfig.json" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Argu" Version="3.7.0" />
     <PackageReference Include="FSharp.Core" Version="4.2.3" />
-    <PackageReference Include="FSharp.Data" Version="2.3.3" />
     <PackageReference Include="ILLink.Tasks" Version="0.1.4-preview-906439" />
     <PackageReference Include="influxdata.net" Version="7.0.3" />
     <PackageReference Include="m2mqttdotnetcore" Version="1.0.7" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.0.1" />
+    <PackageReference Include="Microsoft.FSharpLu.Json" Version="0.10.3" />
     <PackageReference Include="NGeoHash.DotNetCore" Version="1.0.0" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="nuget.config" />
-    <Content Include="runtimeconfig.json" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="2.0.0" />
   </ItemGroup>
 </Project>
