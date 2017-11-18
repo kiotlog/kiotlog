@@ -9,6 +9,7 @@ open Struct
 open PackedValue
 open KiotlogDB
 open KlConversions
+open System.Collections.Generic
 
 module Decoder =
 
@@ -36,8 +37,11 @@ module Decoder =
         
         // Replace with Dictionary<string, float>
         let decoded =
-            List.zip payload sortedSensors
-            |> List.map (fun (p, s) -> s.Meta.Name, doConvert (p, s))
+            let dict = new Dictionary<string, float>()
 
-        printfn "%A" payload
-        printfn "%A" decoded
+            List.zip payload sortedSensors
+            |> List.iter (fun (p, s) -> dict.Add(s.Meta.Name, doConvert (p, s)))
+            
+            dict
+
+        decoded
