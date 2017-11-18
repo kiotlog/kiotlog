@@ -9,14 +9,14 @@ namespace Decoder
 
 open System
 open Microsoft.FSharpLu.Json
+open System.Text.RegularExpressions
 
 open uPLibrary.Networking.M2Mqtt
 open uPLibrary.Networking.M2Mqtt.Messages
 
-open Catalog
+open Decoder
 open Body
 open Json
-open Struct
 open Helpers
 
 module Mqtt =
@@ -29,16 +29,11 @@ module Mqtt =
             |> decode
             |> SnakeCaseSerializer.deserialize
         
-        let formatString = getFormatString cs msg.DevId
+        let channel, app, device =
+            let m = Regex(@"/(\S+)/(\S+)/devices/(\S+)/up").Match(e.Topic)
+            m.Groups.[1].Value, m.Groups.[2].Value, m.Groups.[3].Value
 
-        // Get format string from DB and Unpack
-        let payload =
-            msg.PayloadRaw
-            // |> Convert.FromBase64String
-            |> byteArrayFromHexString
-            |> unpack formatString
-
-        printfn "%A" payload
+        klDecode cs (channel, app, device) msg
 
     let msgSubscribed (e: MqttMsgSubscribedEventArgs) =
         printfn "Sub Message Subscribed: %A" e.GrantedQoSLevels
