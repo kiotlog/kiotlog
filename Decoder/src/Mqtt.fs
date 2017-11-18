@@ -23,7 +23,6 @@ module Mqtt =
 
     let msgReceivedHandler (cs: string) (e: MqttMsgPublishEventArgs) =
 
-        // Decode Message and Deserialize JSON
         let msg : KlBody = 
             e.Message
             |> decode
@@ -33,7 +32,9 @@ module Mqtt =
             let m = Regex(@"/(\S+)/(\S+)/devices/(\S+)/up").Match(e.Topic)
             m.Groups.[1].Value, m.Groups.[2].Value, m.Groups.[3].Value
 
-        klDecode cs (channel, app, device) msg
+        let decodedDict = klDecode cs (channel, app, device) msg
+        
+        printfn "%A" decodedDict
 
     let msgSubscribed (e: MqttMsgSubscribedEventArgs) =
         printfn "Sub Message Subscribed: %A" e.GrantedQoSLevels
