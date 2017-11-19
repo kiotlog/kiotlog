@@ -11,7 +11,7 @@ module Json =
             let s = 
                 JsonSerializerSettings(
                     NullValueHandling = NullValueHandling.Ignore,
-                    MissingMemberHandling = MissingMemberHandling.Error,
+                    MissingMemberHandling = MissingMemberHandling.Ignore,
                     ContractResolver = DefaultContractResolver(
                         NamingStrategy = SnakeCaseNamingStrategy(true, false, false)
                     )
@@ -26,7 +26,7 @@ module Body =
 
     type KlMetaData =
         {
-            Time: int
+            Time: int64
         }
 
     type KlBody =

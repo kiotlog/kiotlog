@@ -10,10 +10,9 @@
     <Compile Include="src/Helpers.fs" />
     <Compile Include="src/Units.fs" />
     <Compile Include="src/Body.fs" />
-    <Compile Include="src/Catalog.fs" />
     <Compile Include="src/Struct.fs" />
     <Compile Include="src/Conversions.fs" />
-    <Compile Include="src/Decoder.fs" />
+    <Compile Include="src/Catalog.fs" />
     <Compile Include="src/Mqtt.fs" />
     <Compile Include="src/Arguments.fs" />
     <Compile Include="src/Program.fs" />

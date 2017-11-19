@@ -18,10 +18,12 @@ open Decoder
 open Body
 open Json
 open Helpers
+open Newtonsoft.Json.Linq
+open System.Collections.Generic
 
 module Mqtt =
 
-    let msgReceivedHandler (cs: string) (e: MqttMsgPublishEventArgs) =
+    let msgReceivedHandler decodeData writeData (e: MqttMsgPublishEventArgs) =
 
         let msg : KlBody = 
             e.Message
@@ -32,9 +34,29 @@ module Mqtt =
             let m = Regex(@"/(\S+)/(\S+)/devices/(\S+)/up").Match(e.Topic)
             m.Groups.[1].Value, m.Groups.[2].Value, m.Groups.[3].Value
 
-        let decodedDict = klDecode cs (channel, app, device) msg
+        let decodedDict =
+            let data : Dictionary<string, float> =
+                decodeData (channel, app, device) msg
+            
+            data
+            |> SnakeCaseSerializer.serialize
         
+        let decodedMeta =
+            let json =
+                e.Message
+                |> decode
+                |> JObject.Parse
+
+            json.["metadata"].ToString()
+        
+        let decodedTime =
+            msg.Metadata.Time
+            |> unixTimeStampToDateTime
+
         printfn "%A" decodedDict
+        printfn "%A" decodedMeta
+
+        writeData (device, decodedTime, decodedMeta, decodedDict)
 
     let msgSubscribed (e: MqttMsgSubscribedEventArgs) =
         printfn "Sub Message Subscribed: %A" e.GrantedQoSLevels

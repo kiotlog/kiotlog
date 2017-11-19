@@ -7,10 +7,17 @@ open uPLibrary.Networking.M2Mqtt.Messages
 
 open Arguments
 open Mqtt
+open Catalog
 
 [<EntryPoint>]
 let main argv =
     let mainConfig = parseCLI argv
+
+    let decodePayload =
+        klDecode mainConfig.PostgresConnectionString
+
+    let writePayload =
+        klWrite mainConfig.PostgresConnectionString
 
     let mqttTopics, mqttQosLevels =
         mainConfig.Topics |> List.toArray,
@@ -18,7 +25,7 @@ let main argv =
 
     let mqttClient = mqttConnect mainConfig.MQTTBroker
 
-    let msgReceived = msgReceivedHandler mainConfig.PostgresConnectionString
+    let msgReceived = msgReceivedHandler decodePayload writePayload
 
     mqttClient.MqttMsgPublishReceived.Add msgReceived
     mqttClient.MqttMsgSubscribed.Add msgSubscribed

@@ -3,45 +3,95 @@ namespace Decoder
 open Microsoft.EntityFrameworkCore
 
 open KiotlogDB
+open System
+open System.Collections.Generic
+
+open Helpers
+open Body
+open Struct
+open PackedValue
+open Conversions
 
 module Catalog =
 
-    let getDevice cs deviceDevice =
-        use ctx = new KiotlogDBContext(cs)
 
-        let device =
-            let devices =
-                ctx.Devices
-                    .Include("Sensors")
-                    .Include("Sensors.SensorType")
-                    .Include("Sensors.Conversion")
+    let private doConvert (field : PackedValue) (sensor : Sensors) =
+        let max = sensor.SensorType.Meta.Max
+        let min = sensor.SensorType.Meta.Min
+        let fn = sensor.Conversion.Fun
 
-            query {
-                for d in devices do
-                where (d.Device = deviceDevice)
-                select d
-                exactlyOne
-            }    
+        klConvert (field.ToFloat()) max min fn
+
+    let private strToByteArray topic = 
+        match topic with
+        | "sigfox" -> byteArrayFromHexString
+        | "lorawan" -> Convert.FromBase64String
+        | _ -> byteArrayFromHexString
+ 
+
+    let private getDevices (ctx : KiotlogDBContext)  =
+
+        ctx.Devices
+            .Include("Sensors")
+            .Include("Sensors.SensorType")
+            .Include("Sensors.Conversion")
         
-        device
-
-    let getSortedSensors cs deviceDevice =  
+    let private getSortedSensors (device : Devices) =  
         
-        let device = getDevice cs deviceDevice
-
         device.Sensors
         |> Seq.sortBy (fun sensor -> sensor.Fmt.Index)
 
-    let getFormatString cs deviceDevice =
-        
-        let device = getDevice cs deviceDevice
+    let private getFormatString (device : Devices) =
 
         let endianness = if device.Frame.Bigendian then ">" else "<"
 
         let fmtString =
-            device.Sensors
-            |> Seq.sortBy (fun sensor -> sensor.Fmt.Index)
+            device
+            |> getSortedSensors
             |> Seq.map (fun sensor -> sensor.Fmt.FmtChr)
             |> Seq.reduce (+)
         
         endianness + fmtString
+    
+    let klDecode (cs : string) (channel, _, _) (msg : KlBody) : Dictionary<string, float> =
+
+        use ctx = new KiotlogDBContext(cs)
+        let devices = getDevices ctx
+
+        let device =
+            query {
+                for d in devices do
+                where (d.Device = msg.DevId)
+                select d
+                exactlyOne
+            }    
+
+        let payload =
+            let formatString = getFormatString device
+
+            msg.PayloadRaw
+            |> strToByteArray channel
+            |> unpack formatString
+        
+        let sortedSensors = getSortedSensors device |> Seq.toList            
+        let decodedDict = new Dictionary<string, float>()
+
+        List.iter2
+            (fun p (s : Sensors) ->
+                decodedDict.Add
+                    (s.Meta.Name, doConvert p s))
+            payload sortedSensors
+        
+        decodedDict
+
+    let klWrite cs (device, time, flags, data) =
+        use ctx = new KiotlogDBContext(cs)
+
+        Points (
+            DeviceDevice = device,
+            Time = time,
+            Flags = flags,
+            Data = data )
+        |> ctx.Points.Add |> ignore
+        
+        ctx.SaveChanges() |> ignore

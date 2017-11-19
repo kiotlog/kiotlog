@@ -25,3 +25,7 @@ module Helpers =
         bytes
         |> Array.map (fun byte -> sprintf "%02x" byte)
         |> Array.reduce (+)    
+    
+    let unixTimeStampToDateTime ts =
+         let dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds ts
+         dateTimeOffset.UtcDateTime
