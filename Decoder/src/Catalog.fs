@@ -14,7 +14,6 @@ open Conversions
 
 module Catalog =
 
-
     let private doConvert (field : PackedValue) (sensor : Sensors) =
         let max = sensor.SensorType.Meta.Max
         let min = sensor.SensorType.Meta.Min
@@ -78,8 +77,7 @@ module Catalog =
 
         List.iter2
             (fun p (s : Sensors) ->
-                decodedDict.Add
-                    (s.Meta.Name, doConvert p s))
+                decodedDict.[s.Meta.Name] <- doConvert p s)
             payload sortedSensors
         
         decodedDict
