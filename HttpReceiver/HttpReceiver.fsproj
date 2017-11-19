@@ -3,7 +3,6 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.0</TargetFramework>
   </PropertyGroup>
-
   <ItemGroup>
     <Compile Include="src/Utils.fs" />
     <Compile Include="src/Catalog.fs" />
@@ -14,12 +13,10 @@
     <Compile Include="src/WebParts.fs" />
     <Compile Include="src/Program.fs" />
   </ItemGroup>
-
   <ItemGroup>
     <None Include="Dockerfile" />
     <None Include="nuget.config" />
   </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="Argu" Version="3.7.0" />
     <PackageReference Include="Chessie" Version="0.6.0" />
@@ -28,11 +25,9 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.0.1" />
     <PackageReference Include="Newtonsoft.JSON" Version="10.0.3" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="2.0.0" />
-    <PackageReference Include="Suave" Version="2.2.1" />
+    <PackageReference Include="Suave" Version="2.3.0-beta" />
   </ItemGroup>
-  
   <ItemGroup>
     <ProjectReference Include="..\KiotlogDB\KiotlogDB.csproj" />
   </ItemGroup>
-
 </Project>
