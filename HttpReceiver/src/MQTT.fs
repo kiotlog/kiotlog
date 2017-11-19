@@ -18,9 +18,9 @@ module MQTT =
 
     /// Publish data to given channel via MQTT client.
     /// Wrap MqttClient.Publish() call in Result type.
-    let mqttPublish (client : MqttClient) (channel, data) =
+    let mqttPublish (client : MqttClient) topic data =
         try
-            client.Publish(channel, data) |> ok
+            client.Publish (topic, data) |> ok
         with
         | :? MqttClientException as ex -> fail ex.Message
 
