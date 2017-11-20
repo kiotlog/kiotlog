@@ -18,6 +18,7 @@ open Decoder
 open Body
 open Json
 open Helpers
+open Newtonsoft.Json
 open Newtonsoft.Json.Linq
 open System.Collections.Generic
 
@@ -47,7 +48,7 @@ module Mqtt =
                 |> decode
                 |> JObject.Parse
 
-            json.["metadata"].ToString()
+            json.["metadata"].ToString(Formatting.None)
         
         let decodedTime =
             msg.Metadata.Time
