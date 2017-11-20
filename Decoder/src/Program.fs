@@ -7,6 +7,7 @@ open uPLibrary.Networking.M2Mqtt.Messages
 
 open Arguments
 open Mqtt
+open Decoder
 open Catalog
 
 [<EntryPoint>]
@@ -17,7 +18,7 @@ let main argv =
         klDecode mainConfig.PostgresConnectionString
 
     let writePayload =
-        klWrite mainConfig.PostgresConnectionString
+        writePoint mainConfig.PostgresConnectionString
 
     let mqttTopics, mqttQosLevels =
         mainConfig.Topics |> List.toArray,

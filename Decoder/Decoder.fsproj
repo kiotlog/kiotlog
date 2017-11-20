@@ -14,6 +14,7 @@
     <Compile Include="src/Conversions.fs" />
     <Compile Include="src/Catalog.fs" />
     <Compile Include="src/Mqtt.fs" />
+    <Compile Include="src/Decoder.fs" />
     <Compile Include="src/Arguments.fs" />
     <Compile Include="src/Program.fs" />
     <Content Include="nuget.config" />

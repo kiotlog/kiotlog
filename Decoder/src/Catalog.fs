@@ -4,31 +4,10 @@ open Microsoft.EntityFrameworkCore
 
 open KiotlogDB
 open System
-open System.Collections.Generic
-
-open Helpers
-open Struct
-open PackedValue
-open Conversions
 
 module Catalog =
 
-    let private doConvert (field : PackedValue) (sensor : Sensors) =
-        let max = sensor.SensorType.Meta.Max
-        let min = sensor.SensorType.Meta.Min
-        let fn = sensor.Conversion.Fun
-
-        klConvert (field.ToFloat()) max min fn
-
-    let private strToByteArray topic = 
-        match topic with
-        | "sigfox" -> byteArrayFromHexString
-        | "lorawan" -> Convert.FromBase64String
-        | _ -> byteArrayFromHexString
- 
-
-    let private getDevices (ctx : KiotlogDBContext)  =
-
+    let getDevices (ctx : KiotlogDBContext)  =
         ctx.Devices
             .Include("Sensors")
             .Include("Sensors.SensorType")
@@ -47,14 +26,11 @@ module Catalog =
                 | :? InvalidOperationException -> None
         device
        
-
-    let private getSortedSensors (device : Devices) =  
-        
+    let getSortedSensors (device : Devices) =  
         device.Sensors
         |> Seq.sortBy (fun sensor -> sensor.Fmt.Index)
 
-    let private getFormatString (device : Devices) =
-
+    let getFormatString (device : Devices) =
         let endianness = if device.Frame.Bigendian then ">" else "<"
 
         let fmtString =
@@ -64,36 +40,8 @@ module Catalog =
             |> Seq.reduce (+)
         
         endianness + fmtString
-    
-    let klDecode (cs : string) (channel, _, _) devId payloadRaw : Dictionary<string, float> option =
 
-        use ctx = new KiotlogDBContext(cs)
-        
-        ctx
-        |> getDevices
-        |> getDevice devId
-        |> function
-        | None -> None
-        | Some device -> 
-            let payload =
-                payloadRaw
-                |> strToByteArray channel
-                |> unpack (getFormatString device)
-            
-            let sortedSensors = getSortedSensors device |> Seq.toList       
-            let decodedDict = new Dictionary<string, float>()
-
-            match payload with
-            | [] -> None
-            | _ ->
-                List.iter2
-                    (fun p (s : Sensors) ->
-                        decodedDict.[s.Meta.Name] <- doConvert p s)
-                    payload sortedSensors
-    
-                Some decodedDict
-
-    let klWrite cs (device, time, flags, data) =
+    let writePoint cs (device, time, flags, data) =
         match data with
         | None -> ()
         | Some data ->

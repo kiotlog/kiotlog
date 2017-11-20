@@ -45,10 +45,9 @@ module Mqtt =
             | _ -> DateTime.Now                     
 
         let decodedDict =
-            let devId = string msg.["dev_id"]
             let payloadRaw = string msg.["payload_raw"]
             let data : Dictionary<string, float> option =
-                decodeData (channel, app, device) devId payloadRaw
+                decodeData (channel, app, device) payloadRaw
             
             match data with
             | None -> None
