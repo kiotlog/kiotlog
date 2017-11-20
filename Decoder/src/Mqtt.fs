@@ -15,7 +15,6 @@ open uPLibrary.Networking.M2Mqtt
 open uPLibrary.Networking.M2Mqtt.Messages
 
 open Decoder
-open Body
 open Json
 open Helpers
 open Newtonsoft.Json
@@ -26,37 +25,38 @@ module Mqtt =
 
     let msgReceivedHandler decodeData writeData (e: MqttMsgPublishEventArgs) =
 
-        let msg : KlBody = 
+        let msg = 
             e.Message
             |> decode
-            |> SnakeCaseSerializer.deserialize
+            |> JObject.Parse
         
         let channel, app, device =
             let m = Regex(@"/(\S+)/(\S+)/devices/(\S+)/up").Match(e.Topic)
             m.Groups.[1].Value, m.Groups.[2].Value, m.Groups.[3].Value
 
-        let decodedDict =
-            let data : Dictionary<string, float> =
-                decodeData (channel, app, device) msg
-            
-            data
-            |> SnakeCaseSerializer.serialize
-        
         let decodedMeta =
-            let json =
-                e.Message
-                |> decode
-                |> JObject.Parse
-
-            json.["metadata"].ToString(Formatting.None)
+            msg.["metadata"].ToString(Formatting.None)
         
         let decodedTime =
-            msg.Metadata.Time
-            |> unixTimeStampToDateTime
+            let time = msg.["metadata"].["time"]
+            match channel with
+            | "sigfox" -> time |> int64 |> unixTimeStampToDateTime
+            | "lorawan" -> time |> string |> DateTime.Parse
+            | _ -> DateTime.Now                     
 
-        printfn "%A" decodedDict
-        printfn "%A" decodedMeta
+        let decodedDict =
+            let devId = string msg.["dev_id"]
+            let payloadRaw = string msg.["payload_raw"]
+            let data : Dictionary<string, float> option =
+                decodeData (channel, app, device) devId payloadRaw
+            
+            match data with
+            | None -> None
+            | Some data -> data |> SnakeCaseSerializer.serialize |> Some
 
+
+        printfn "[%A] [%s] %O" decodedTime device decodedDict
+        printfn "[%A] [%s] %A" decodedTime device decodedMeta
         writeData (device, decodedTime, decodedMeta, decodedDict)
 
     let msgSubscribed (e: MqttMsgSubscribedEventArgs) =

@@ -7,7 +7,6 @@ open System
 open System.Collections.Generic
 
 open Helpers
-open Body
 open Struct
 open PackedValue
 open Conversions
@@ -52,44 +51,56 @@ module Catalog =
         
         endianness + fmtString
     
-    let klDecode (cs : string) (channel, _, _) (msg : KlBody) : Dictionary<string, float> =
+    let klDecode (cs : string) (channel, _, _) devId payloadRaw : Dictionary<string, float> option =
 
         use ctx = new KiotlogDBContext(cs)
         let devices = getDevices ctx
 
         let device =
-            query {
-                for d in devices do
-                where (d.Device = msg.DevId)
-                select d
-                exactlyOne
-            }    
+            try
+                query {
+                    for d in devices do
+                    where (d.Device = devId)
+                    select d
+                    exactlyOne
+                } |> Some
+            with
+                | :? InvalidOperationException -> None            
 
-        let payload =
-            let formatString = getFormatString device
+        match device with
+        | None -> None
+        | Some device -> 
+            let payload =
+                let formatString = getFormatString device
 
-            msg.PayloadRaw
-            |> strToByteArray channel
-            |> unpack formatString
-        
-        let sortedSensors = getSortedSensors device |> Seq.toList            
-        let decodedDict = new Dictionary<string, float>()
+                payloadRaw
+                |> strToByteArray channel
+                |> unpack formatString
+            
+            let sortedSensors = getSortedSensors device |> Seq.toList       
+            let decodedDict = new Dictionary<string, float>()
 
-        List.iter2
-            (fun p (s : Sensors) ->
-                decodedDict.[s.Meta.Name] <- doConvert p s)
-            payload sortedSensors
-        
-        decodedDict
+            match payload with
+            | [] -> None
+            | _ ->
+                List.iter2
+                    (fun p (s : Sensors) ->
+                        decodedDict.[s.Meta.Name] <- doConvert p s)
+                    payload sortedSensors
+    
+                Some decodedDict
 
     let klWrite cs (device, time, flags, data) =
-        use ctx = new KiotlogDBContext(cs)
+        match data with
+        | None -> ()
+        | Some data ->
+            use ctx = new KiotlogDBContext(cs)
 
-        Points (
-            DeviceDevice = device,
-            Time = time,
-            Flags = flags,
-            Data = data )
-        |> ctx.Points.Add |> ignore
+            Points (
+                DeviceDevice = device,
+                Time = time,
+                Flags = flags,
+                Data = data )
+            |> ctx.Points.Add |> ignore
         
-        ctx.SaveChanges() |> ignore
+            ctx.SaveChanges() |> ignore

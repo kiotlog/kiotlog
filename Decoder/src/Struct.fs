@@ -202,7 +202,7 @@ module Struct =
             sprintf "Wrong format or I would expect %d bytes less" diff |> failwith
         | Compare (<) (diff) ->
             sprintf "Wrong format or I would expect %d bytes more" -diff |> failwith
-        | _ -> ()
+        | _ -> receivedLen
 
     let private readAtom (streamReader : BinaryReader) =
         function
@@ -236,22 +236,27 @@ module Struct =
 
     let unpack (fmt : string) (data : byte []) : list<PackedValue> =
 
-        let dataLen = data.Length
+        let validDataLen = 
+            try
+                Some (checkMatchingSize data.Length (calcsize fmt))
+            with
+                | Failure(msg) -> printfn "%s" msg; None
 
-        checkMatchingSize dataLen (calcsize fmt) |> ignore
+        match validDataLen with
+        | None -> []
+        | Some dataLen ->
+            use dataStream = new MemoryStream(dataLen)
+            dataStream.Write(data, 0, dataLen) |> ignore
+            dataStream.Seek(0L, SeekOrigin.Begin) |> ignore
+            use reader = new BinaryReader(dataStream)
 
-        use dataStream = new MemoryStream(dataLen)
-        dataStream.Write(data, 0, dataLen) |> ignore
-        dataStream.Seek(0L, SeekOrigin.Begin) |> ignore
-        use reader = new BinaryReader(dataStream)
+            let unpackData =
+                let convertAtom = readAtom reader
+                let adjustEndianness = chooseEndianness nativeEndianness (dataEndianness fmt.[0])
 
-        let unpackData =
-            let convertAtom = readAtom reader
-            let adjustEndianness = chooseEndianness nativeEndianness (dataEndianness fmt.[0])
+                List.map (convertAtom >> adjustEndianness)
 
-            List.map (convertAtom >> adjustEndianness)
-
-        fmt
-        |> explodeFormatString
-        |> stripEndiannessChar
-        |> unpackData
+            fmt
+            |> explodeFormatString
+            |> stripEndiannessChar
+            |> unpackData
