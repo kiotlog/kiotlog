@@ -23,8 +23,8 @@ module Helpers =
     
     let hexStringFromByteArray (bytes : byte []) =
         bytes
-        |> Array.map (fun byte -> sprintf "%02x" byte)
-        |> Array.reduce (+)    
+        |> Array.map (fun b -> sprintf "%02x" b)
+        |> Array.reduce (+)
     
     let unixTimeStampToDateTime ts =
          let dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds ts
