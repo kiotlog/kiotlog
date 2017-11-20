@@ -33,7 +33,21 @@ module Catalog =
             .Include("Sensors")
             .Include("Sensors.SensorType")
             .Include("Sensors.Conversion")
-        
+    
+    let getDevice devId (devices : Linq.IQueryable<Devices>)  =
+        let device =
+            try
+                query {
+                    for d in devices do
+                    where (d.Device = devId)
+                    select d
+                    exactlyOne
+                } |> Some
+            with
+                | :? InvalidOperationException -> None
+        device
+       
+
     let private getSortedSensors (device : Devices) =  
         
         device.Sensors
@@ -54,28 +68,17 @@ module Catalog =
     let klDecode (cs : string) (channel, _, _) devId payloadRaw : Dictionary<string, float> option =
 
         use ctx = new KiotlogDBContext(cs)
-        let devices = getDevices ctx
-
-        let device =
-            try
-                query {
-                    for d in devices do
-                    where (d.Device = devId)
-                    select d
-                    exactlyOne
-                } |> Some
-            with
-                | :? InvalidOperationException -> None            
-
-        match device with
+        
+        ctx
+        |> getDevices
+        |> getDevice devId
+        |> function
         | None -> None
         | Some device -> 
             let payload =
-                let formatString = getFormatString device
-
                 payloadRaw
                 |> strToByteArray channel
-                |> unpack formatString
+                |> unpack (getFormatString device)
             
             let sortedSensors = getSortedSensors device |> Seq.toList       
             let decodedDict = new Dictionary<string, float>()
