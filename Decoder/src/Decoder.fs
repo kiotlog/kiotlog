@@ -14,11 +14,11 @@ open Catalog
 
 module Decoder =
 
-    let private strToByteArray topic = 
-        match topic with
+    let private strToByteArray channel = 
+        match channel with
         | "sigfox" -> byteArrayFromHexString
         | "lorawan" -> Convert.FromBase64String
-        | _ -> byteArrayFromHexString
+        | _ -> encode
 
     let private doConvert (field : PackedValue) (sensor : Sensors) =
         let max = sensor.SensorType.Meta.Max
