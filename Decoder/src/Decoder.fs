@@ -42,7 +42,7 @@ module Decoder =
     let private decodePayload channel rawPayload =
         function
         | None -> None
-        | Some device -> 
+        | Some (device : Devices) -> 
             let sortedSensors = getSortedSensors device |> Seq.toList  
             let formatString = getFormatString device
             
