@@ -23,7 +23,9 @@ module Catalog =
                     exactlyOne
                 } |> Some
             with
-                | :? InvalidOperationException -> None
+                | :? InvalidOperationException as ex ->
+                    printfn "Device %s not found: %s" devId ex.Message
+                    None
         device
        
     let getSortedSensors (device : Devices) =  
@@ -31,7 +33,11 @@ module Catalog =
         |> Seq.sortBy (fun sensor -> sensor.Fmt.Index)
 
     let getFormatString (device : Devices) =
-        let endianness = if device.Frame.Bigendian then ">" else "<"
+        let endianness = 
+            try
+                if device.Frame.Bigendian then ">" else "<"
+            with
+                | :? ArgumentException -> "<"
 
         let fmtString =
             device
