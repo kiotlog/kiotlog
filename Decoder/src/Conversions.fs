@@ -12,13 +12,25 @@ module Conversions =
         
         float value / conversionFactor
 
-    let xMul mul (value : float) (max : int) (min : int) : float =
+    let int8ToFloat (value : float) (max : int) (min : int) : float =
+        let conversionFactor = float ((1 <<< 7) - 1) / float (max - min)
+        
+        float value / conversionFactor
+
+    let uint8ToFloat (value : float) (max : int) (min : int) : float =
+        let conversionFactor = float ((1 <<< 8) - 1) / float (max - min)
+        
+        float value / conversionFactor        
+
+    let xMul mul (value : float) (_ : int) (_ : int) : float =
         float value / mul
     
     let inline klConvert value max min fn =
         match fn with
         | "float_to_int16" -> int16ToFloat value max min
         | "float_to_uint16" -> uint16ToFloat value max min
+        | "float_to_int8" -> int8ToFloat value max min
+        | "float_to_uint8" -> uint8ToFloat value max min
         | "x10" -> xMul 10. value max min
         | "x100" -> xMul 100. value max min
         | _ -> float value
