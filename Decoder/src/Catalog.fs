@@ -14,33 +14,39 @@ module Catalog =
             .Include("Sensors.Conversion")
     
     let getDevice devId (devices : Linq.IQueryable<Devices>)  =
-        let device =
-            try
-                query {
-                    for d in devices do
-                    where (d.Device = devId)
-                    select d
-                    exactlyOne
-                } |> Some
-            with
-                | :? InvalidOperationException as ex ->
-                    printfn "Device %s not found: %s" devId ex.Message
-                    None
-        device
+        try
+            query {
+                for d in devices do
+                where (d.Device = devId)
+                select d
+                exactlyOne
+            } |> Some
+        with
+            | :? InvalidOperationException as ex ->
+                eprintfn "Device %s not found. [%s]" devId ex.Message
+                None
        
     let getSortedSensors (device : Devices) =
         try 
             device.Sensors
             |> Seq.sortBy (fun sensor -> sensor.Fmt.Index) |> Some
         with
-            | :? ArgumentException -> None
+            | :? ArgumentException as ex ->
+                eprintfn
+                    "Sensors not found for %s. [%s]"
+                    device.Device ex.Message                
+                None
 
     let getFormatString (device : Devices) =
         let endianness = 
             try
                 if device.Frame.Bigendian then ">" else "<"
             with
-                | :? ArgumentException -> "<"
+                | :? ArgumentException as ex ->
+                    eprintfn
+                        "Endianness not specified for %s. Forcing Little. [%s]"
+                        device.Device ex.Message
+                    "<"
 
         let fmtString =
             device
