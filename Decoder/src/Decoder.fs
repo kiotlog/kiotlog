@@ -43,8 +43,15 @@ module Decoder =
         function
         | None -> None
         | Some (device : Devices) -> 
-            let sortedSensors = getSortedSensors device |> Seq.toList  
-            let formatString = getFormatString device
+            let sortedSensors =
+                match getSortedSensors device with
+                | None -> []
+                | Some sensors -> sensors |> Seq.toList
+
+            let formatString =
+                match getFormatString device with
+                | None -> ""
+                | Some fmt -> fmt
             
             rawPayload
             |> strToByteArray channel

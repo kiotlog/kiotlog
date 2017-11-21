@@ -28,9 +28,12 @@ module Catalog =
                     None
         device
        
-    let getSortedSensors (device : Devices) =  
-        device.Sensors
-        |> Seq.sortBy (fun sensor -> sensor.Fmt.Index)
+    let getSortedSensors (device : Devices) =
+        try 
+            device.Sensors
+            |> Seq.sortBy (fun sensor -> sensor.Fmt.Index) |> Some
+        with
+            | :? ArgumentException -> None
 
     let getFormatString (device : Devices) =
         let endianness = 
@@ -42,10 +45,17 @@ module Catalog =
         let fmtString =
             device
             |> getSortedSensors
-            |> Seq.map (fun sensor -> sensor.Fmt.FmtChr)
-            |> Seq.reduce (+)
-        
-        endianness + fmtString
+            |> function
+            | None -> None
+            | Some sensors ->
+                sensors
+                |> Seq.map (fun sensor -> sensor.Fmt.FmtChr)
+                |> Seq.reduce (+)
+                |> Some
+
+        match fmtString with
+        | None -> None
+        | Some fmt -> endianness + fmt |> Some
 
     let writePoint cs (device, time, flags, data) =
         match data with
