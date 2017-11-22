@@ -32,7 +32,8 @@ RUN set -ef \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=build-env /Sln/${PROJECT}/out ./
-# COPY ${PROJECT}/docker-entrypoint.sh /
-# # ENTRYPOINT ["/docker-entrypoint.sh" ]
+
+ENV LC_ALL en_US.UTF-8
+ENV LANG en_US.UTF-8
 
 ENTRYPOINT ["/App/Decoder"]
