@@ -62,7 +62,7 @@ module Mqtt =
 
         let getMeta mm =
             try
-                let flags = mm.Json.Value.["metadata"].ToString(Formatting.None) |> string
+                let flags = mm.Json.Value.["metadata"].ToString(Formatting.None)
                 ok { mm with Flags = Some flags }
             with | :? NullReferenceException -> fail "Metadata not found"
 
@@ -83,14 +83,14 @@ module Mqtt =
                 ok { mm with PayloadRaw = Some payload}
             with | :? JsonException -> fail "Payload not found"            
 
-        let logDecode (d, f ) twoTrackInput = 
-            let success (x, _) = printfn "[%A] [%s] %A %A" DateTime.Now d f x
-            let failure msgs = eprintfn "[%A] [%s] DECODING ERROR. %A" DateTime.Now d msgs
+        let logDecode d twoTrackInput = 
+            let success (x, _) = printfn "DECODING - [%A] [%s] %A" DateTime.Now d x
+            let failure msgs = eprintfn "DECODING - [%A] [%s] ERRORS: %A" DateTime.Now d msgs
             eitherTee success failure twoTrackInput
 
         let logRequest d twoTrackInput = 
-            let success (x, _) = printfn "[%A] [%s] %A" DateTime.Now d x
-            let failure msgs = eprintfn "[%A] [%s] REQUEST ERROR. %A" DateTime.Now d msgs
+            let success (x, _) = printfn "REQUEST - [%A] [%s] %A" DateTime.Now d (x.Json.Value.ToString(Formatting.None))
+            let failure msgs = eprintfn "REQUEST - [%A] [%s] ERRORS %A" DateTime.Now d msgs
             eitherTee success failure twoTrackInput
 
         let validateRequest p =
@@ -105,7 +105,7 @@ module Mqtt =
             |> decodeData (channel, app, device)
             |> bind (SnakeCaseSerializer.serialize<Dictionary<string, float>> >> ok)
             |> successTee (writeData device mm.Datetime.Value mm.Flags.Value)
-            |> logDecode (device, mm.Flags.Value)
+            |> logDecode device
 
         let writeValidatedData =
             validateRequest point
