@@ -3,6 +3,8 @@ namespace Decoder
 open System
 open System.Collections.Generic
 
+open Chessie.ErrorHandling
+
 open Struct
 open PackedValue
 
@@ -27,43 +29,48 @@ module Decoder =
 
         klConvert (field.ToFloat()) max min fn
 
-    let private convertMeasures sensors =
-        function
-        | [] -> None
-        | payload ->
+    let private convertMeasures sensors payload =
+        match payload with
+        | [] -> fail "Empty Payload"
+        | _ ->
             let decodedDict = new Dictionary<string, float>()            
             List.iter2
                 (fun (s : Sensors) p ->
                     decodedDict.[s.Meta.Name] <- doConvert p s)
                 sensors payload 
 
-            Some decodedDict
+            ok decodedDict
 
-    let private decodePayload channel rawPayload =
-        function
-        | None -> None
-        | Some (device : Devices) -> 
-            let sortedSensors =
-                match getSortedSensors device with
-                | None -> []
-                | Some sensors -> sensors |> Seq.toList
+    let private decodePayload channel rawPayload device =
+        let sortedSensors =
+            getSortedSensors device
+            |> returnOrFail
+            |> Seq.toList
 
-            let formatString =
-                match getFormatString device with
-                | None -> ""
-                | Some fmt -> fmt
-            
+        let formatString =
+            getFormatString device
+            |> returnOrFail
+        
+        let payload =
             rawPayload
             |> strToByteArray channel
-            |> unpack formatString
-            |> convertMeasures sortedSensors
+
+        let validatedUnpack p =
+            unpack formatString p
+            |> bind (convertMeasures sortedSensors)
+        
+        payload
+        |> validatedUnpack
     
-    let klDecode (cs : string) (channel, _, device) payloadRaw : Dictionary<string, float> option =
+    let klDecode (cs : string) (channel, _, device) payloadRaw =
 
         use ctx = new KiotlogDBContext(cs)
+        let devices = getDevices ctx
+
+        let validatedDecode p =        
+            getDevice device devices
+            |> bind (decodePayload channel p)
         
-        ctx
-        |> getDevices
-        |> getDevice device
-        |> decodePayload channel payloadRaw
+        payloadRaw
+        |> validatedDecode
 

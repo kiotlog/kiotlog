@@ -8,57 +8,107 @@ namespace Decoder
 // open Units
 
 open System
-open Microsoft.FSharpLu.Json
+open System.Threading
 open System.Text.RegularExpressions
+open System.Collections.Generic
+
+open Microsoft.FSharpLu.Json
 
 open uPLibrary.Networking.M2Mqtt
 open uPLibrary.Networking.M2Mqtt.Messages
+open uPLibrary.Networking.M2Mqtt.Exceptions
+
+open Newtonsoft.Json
+open Newtonsoft.Json.Linq
+
+open Chessie.ErrorHandling
 
 open Decoder
 open Json
 open Helpers
-open Newtonsoft.Json
-open Newtonsoft.Json.Linq
-open System.Collections.Generic
-open uPLibrary.Networking.M2Mqtt.Exceptions
-open System.Threading
+
 
 module Mqtt =
 
+    type RequestPoint = {
+        Json : JObject option
+        Device : string option
+        Datetime : DateTime option
+        Flags : string option
+        PayloadRaw: string option
+    }
+
     let msgReceivedHandler decodeData writeData (e: MqttMsgPublishEventArgs) =
 
-        let msg = 
-            e.Message
-            |> decode
-            |> JObject.Parse
-        
         let channel, app, device =
             let m = Regex(@"/(\S+)/(\S+)/devices/(\S+)/up").Match(e.Topic)
-            m.Groups.[1].Value, m.Groups.[2].Value, m.Groups.[3].Value
+            if m.Success
+                then m.Groups.[1].Value, m.Groups.[2].Value, m.Groups.[3].Value
+                else ("", "", "")
 
-        let decodedMeta =
-            msg.["metadata"].ToString(Formatting.None)
+        let point = {
+            Json = None
+            Device = Some device
+            Datetime = None
+            Flags = None
+            PayloadRaw = None
+        }
+
+        let getMsg mm (m : byte []) =
+            try
+                let json = m |> decode |> JObject.Parse
+                ok { mm with Json = Some json }
+            with | :? JsonException -> fail "Invalid JSON"
+
+        let getMeta mm =
+            try
+                let flags = mm.Json.Value.["metadata"].ToString(Formatting.None) |> string
+                ok { mm with Flags = Some flags }
+            with | :? NullReferenceException -> fail "Metadata not found"
+
+        let getTime mm =
+            try
+                let time = mm.Json.Value.["metadata"].["time"] |> string
+                let dateTime = 
+                    match channel with
+                    | "sigfox" -> unixTimeStampToDateTime(int64 time)
+                    | "lorawan" -> DateTime.Parse(time).ToUniversalTime()
+                    | _ -> DateTime.UtcNow
+                ok { mm with Datetime = Some dateTime}
+            with | _ -> fail "Invalid time"
+
+        let getPayloadRaw mm =
+            try
+                let payload = mm.Json.Value.["payload_raw"] |> string
+                ok { mm with PayloadRaw = Some payload}
+            with | :? JsonException -> fail "Payload not found"            
+
+        let log time device flags twoTrackInput = 
+            let success (x, _) = printfn "[%A] [%s] %A %A" time device flags x
+            let failure msgs = eprintfn "[%A] [%s] ERROR. %A" time device msgs
+            eitherTee success failure twoTrackInput
         
-        let decodedTime =
-            let time = msg.["metadata"].["time"]
-            match channel with
-            | "sigfox" -> time |> int64 |> unixTimeStampToDateTime
-            | "lorawan" -> time |> string |> DateTime.Parse
-            | _ -> DateTime.Now                     
+        let validateRequest =
+            getMsg point
+            >> bind getMeta
+            >> bind getTime
+            >> bind getPayloadRaw
+            // >> log DateTime.Now device
 
-        let decodedDict =
-            let payloadRaw = string msg.["payload_raw"]
-            let data : Dictionary<string, float> option =
-                decodeData (channel, app, device) payloadRaw
-            
-            match data with
-            | None -> None
-            | Some data -> data |> SnakeCaseSerializer.serialize |> Some
+        let validatedWrite mm =
+            mm.PayloadRaw.Value
+            |> decodeData (channel, app, device)
+            |> bind (SnakeCaseSerializer.serialize<Dictionary<string, float>> >> ok)
+            |> successTee (writeData device mm.Datetime.Value mm.Flags.Value)
+            |> log DateTime.Now device mm.Flags.Value
 
-
-        printfn "[%A] [%s] %O" decodedTime device decodedDict
-        printfn "[%A] [%s] %A" decodedTime device decodedMeta
-        writeData (device, decodedTime, decodedMeta, decodedDict)
+        let writeValidatedData =
+            validateRequest
+            >> (bind validatedWrite)
+     
+        e.Message
+        |> writeValidatedData
+        |> ignore
 
     let msgSubscribed (e: MqttMsgSubscribedEventArgs) =
         printfn "Sub Message Subscribed: %A" e.GrantedQoSLevels

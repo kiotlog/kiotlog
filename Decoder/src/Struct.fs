@@ -4,6 +4,8 @@ open System
 open System.IO
 open System.Net
 
+open Chessie.ErrorHandling
+
 module PackedValue =
 
     type PackedValue =
@@ -199,10 +201,10 @@ module Struct =
 
         match (receivedLen, calculatedLen) with
         | Compare (>) (diff) ->
-            sprintf "Wrong format or I would expect %d bytes less" diff |> failwith
+            sprintf "Wrong format or I would expect %d bytes less" diff |> fail
         | Compare (<) (diff) ->
-            sprintf "Wrong format or I would expect %d bytes more" -diff |> failwith
-        | _ -> receivedLen
+            sprintf "Wrong format or I would expect %d bytes more" -diff |> fail
+        | _ -> ok receivedLen
 
     let private readAtom (streamReader : BinaryReader) =
         function
@@ -234,17 +236,9 @@ module Struct =
         |> List.map sizeOfAtom
         |> List.reduce (+)
 
-    let unpack (fmt : string) (data : byte []) : list<PackedValue> =
+    let unpack (fmt : string) (data : byte []) (* : list<PackedValue> *)=
 
-        let validDataLen = 
-            try
-                Some (checkMatchingSize data.Length (calcsize fmt))
-            with
-                | Failure(msg) -> printfn "%s" msg; None
-
-        match validDataLen with
-        | None -> []
-        | Some dataLen ->
+        let _unpack (dataLen : int) =
             use dataStream = new MemoryStream(dataLen)
             dataStream.Write(data, 0, dataLen) |> ignore
             dataStream.Seek(0L, SeekOrigin.Begin) |> ignore
@@ -260,3 +254,9 @@ module Struct =
             |> explodeFormatString
             |> stripEndiannessChar
             |> unpackData
+            // |> ok
+        
+        checkMatchingSize data.Length (calcsize fmt)
+        |> lift _unpack
+        // >> returnOrFail
+        
