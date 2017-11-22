@@ -23,7 +23,7 @@ module Json =
         JsonConvert.DeserializeObject<'a> json
 
     let getResourceFromReq<'a> (req : HttpRequest) =
-        let decode rawForm =
+        let decode (rawForm : byte []) =
             Encoding.UTF8.GetString rawForm
 
         req.rawForm |> decode |> fromJson<'a>
