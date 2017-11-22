@@ -83,28 +83,33 @@ module Mqtt =
                 ok { mm with PayloadRaw = Some payload}
             with | :? JsonException -> fail "Payload not found"            
 
-        let log time device flags twoTrackInput = 
-            let success (x, _) = printfn "[%A] [%s] %A %A" time device flags x
-            let failure msgs = eprintfn "[%A] [%s] ERROR. %A" time device msgs
+        let logDecode (d, f ) twoTrackInput = 
+            let success (x, _) = printfn "[%A] [%s] %A %A" DateTime.Now d f x
+            let failure msgs = eprintfn "[%A] [%s] DECODING ERROR. %A" DateTime.Now d msgs
             eitherTee success failure twoTrackInput
-        
-        let validateRequest =
-            getMsg point
+
+        let logRequest d twoTrackInput = 
+            let success (x, _) = printfn "[%A] [%s] %A" DateTime.Now d x
+            let failure msgs = eprintfn "[%A] [%s] REQUEST ERROR. %A" DateTime.Now d msgs
+            eitherTee success failure twoTrackInput
+
+        let validateRequest p =
+            getMsg p
             >> bind getMeta
             >> bind getTime
             >> bind getPayloadRaw
-            // >> log DateTime.Now device
+            >> logRequest device
 
         let validatedWrite mm =
             mm.PayloadRaw.Value
             |> decodeData (channel, app, device)
             |> bind (SnakeCaseSerializer.serialize<Dictionary<string, float>> >> ok)
             |> successTee (writeData device mm.Datetime.Value mm.Flags.Value)
-            |> log DateTime.Now device mm.Flags.Value
+            |> logDecode (device, mm.Flags.Value)
 
         let writeValidatedData =
-            validateRequest
-            >> (bind validatedWrite)
+            validateRequest point
+            >> bind validatedWrite
      
         e.Message
         |> writeValidatedData
@@ -129,7 +134,7 @@ module Mqtt =
         with
             | :? MqttConnectionException ->
                 eprintfn "Connection failed. Retrying in 10 seconds."
-                Thread.Sleep 10
+                Thread.Sleep 10000
                 mqttConnect (broker, port)
 
     // let connectionClosedHandler (client: MqttClient) parameters (e: EventArgs) =
