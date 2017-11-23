@@ -3,6 +3,7 @@ namespace Decoder
 open System
 open System.Collections.Generic
 
+open Newtonsoft.Json
 open Chessie.ErrorHandling
 
 open Struct
@@ -14,7 +15,6 @@ open Conversions
 open KiotlogDB
 open Catalog
 open Request
-open Json
 
 module Decoder =
 
@@ -72,7 +72,7 @@ module Decoder =
         let devices = getDevices dbCtx
 
         let serializeData d =
-            ok (SnakeCaseSerializer.serialize<Dictionary<string, float>> d)
+            ok (JsonConvert.SerializeObject(d, Formatting.None))
 
         let validatedDecode p =        
             getDevice device devices

@@ -13,8 +13,6 @@
 
   <ItemGroup>
     <Compile Include="src/Helpers.fs" />
-    <Compile Include="src/Units.fs" />
-    <Compile Include="src/Body.fs" />
     <Compile Include="src/Struct.fs" />
     <Compile Include="src/Conversions.fs" />
     <Compile Include="src/Request.fs" />
@@ -34,8 +32,6 @@
     <PackageReference Include="ILLink.Tasks" Version="0.1.4-preview-981901" />
     <PackageReference Include="m2mqttdotnetcore" Version="1.0.7" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.0.1" />
-    <PackageReference Include="Microsoft.FSharpLu.Json" Version="0.10.3" />
-    <PackageReference Include="NGeoHash.DotNetCore" Version="1.0.0" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="2.0.0" />
   </ItemGroup>
 
