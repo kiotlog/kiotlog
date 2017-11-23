@@ -13,6 +13,8 @@ open Conversions
 
 open KiotlogDB
 open Catalog
+open Request
+open Json
 
 module Decoder =
 
@@ -62,15 +64,27 @@ module Decoder =
         payload
         |> validatedUnpack
     
-    let klDecode (cs : string) (channel, _, device) payloadRaw =
+    let klDecode (cs : string) ctx =
 
-        use ctx = new KiotlogDBContext(cs)
-        let devices = getDevices ctx
+        let channel, _, device = ctx.TopicParts
+
+        use dbCtx = new KiotlogDBContext(cs)
+        let devices = getDevices dbCtx
+
+        let serializeData d =
+            ok (SnakeCaseSerializer.serialize<Dictionary<string, float>> d)
 
         let validatedDecode p =        
             getDevice device devices
             |> bind (decodePayload channel p)
         
-        payloadRaw
-        |> validatedDecode
+        let data =
+            let success (x, _) = x
+            let failure msgs = eprintfn "%A" msgs; ""
 
+            ctx.PayloadRaw.Value
+            |> validatedDecode
+            |> bind serializeData
+            |> either success failure
+        
+        ok { ctx with Data = Some data }

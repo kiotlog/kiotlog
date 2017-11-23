@@ -10,106 +10,40 @@ namespace Decoder
 open System
 open System.Threading
 open System.Text.RegularExpressions
-open System.Collections.Generic
-
-open Microsoft.FSharpLu.Json
 
 open uPLibrary.Networking.M2Mqtt
 open uPLibrary.Networking.M2Mqtt.Messages
 open uPLibrary.Networking.M2Mqtt.Exceptions
 
-open Newtonsoft.Json
-open Newtonsoft.Json.Linq
-
 open Chessie.ErrorHandling
 
 open Decoder
-open Json
-open Helpers
-
+open Catalog
+open Request
 
 module Mqtt =
 
-    type RequestPoint = {
-        Json : JObject option
-        Device : string option
-        Datetime : DateTime option
-        Flags : string option
-        PayloadRaw: string option
-    }
-
     let msgReceivedHandler decodeData writeData (e: MqttMsgPublishEventArgs) =
 
-        let channel, app, device =
+        let topicParts =
             let m = Regex(@"/(\S+)/(\S+)/devices/(\S+)/up").Match(e.Topic)
             if m.Success
                 then m.Groups.[1].Value, m.Groups.[2].Value, m.Groups.[3].Value
                 else ("", "", "")
 
-        let point = {
-            Json = None
-            Device = Some device
+        let ctx = {
+            TopicParts = topicParts
+            Request = None
+            PayloadRaw = None
+            
             Datetime = None
             Flags = None
-            PayloadRaw = None
+            Data = None
         }
 
-        let getMsg mm (m : byte []) =
-            try
-                let json = m |> decode |> JObject.Parse
-                ok { mm with Json = Some json }
-            with | :? JsonException -> fail "Invalid JSON"
-
-        let getMeta mm =
-            try
-                let flags = mm.Json.Value.["metadata"].ToString(Formatting.None)
-                ok { mm with Flags = Some flags }
-            with | :? NullReferenceException -> fail "Metadata not found"
-
-        let getTime mm =
-            try
-                let time = mm.Json.Value.["metadata"].["time"] |> string
-                let dateTime = 
-                    match channel with
-                    | "sigfox" -> unixTimeStampToDateTime(int64 time)
-                    | "lorawan" -> DateTime.Parse(time).ToUniversalTime()
-                    | _ -> DateTime.UtcNow
-                ok { mm with Datetime = Some dateTime}
-            with | _ -> fail "Invalid time"
-
-        let getPayloadRaw mm =
-            try
-                let payload = mm.Json.Value.["payload_raw"] |> string
-                ok { mm with PayloadRaw = Some payload}
-            with | :? JsonException -> fail "Payload not found"            
-
-        let logDecode d twoTrackInput = 
-            let success (x, _) = printfn "DECODING - [%A] [%s] %A" DateTime.Now d x
-            let failure msgs = eprintfn "DECODING - [%A] [%s] ERRORS: %A" DateTime.Now d msgs
-            eitherTee success failure twoTrackInput
-
-        let logRequest d twoTrackInput = 
-            let success (x, _) = printfn "REQUEST - [%A] [%s] %A" DateTime.Now d (x.Json.Value.ToString(Formatting.None))
-            let failure msgs = eprintfn "REQUEST - [%A] [%s] ERRORS %A" DateTime.Now d msgs
-            eitherTee success failure twoTrackInput
-
-        let validateRequest p =
-            getMsg p
-            >> bind getMeta
-            >> bind getTime
-            >> bind getPayloadRaw
-            >> logRequest device
-
-        let validatedWrite mm =
-            mm.PayloadRaw.Value
-            |> decodeData (channel, app, device)
-            |> bind (SnakeCaseSerializer.serialize<Dictionary<string, float>> >> ok)
-            |> successTee (writeData device mm.Datetime.Value mm.Flags.Value)
-            |> logDecode device
-
-        let writeValidatedData =
-            validateRequest point
-            >> bind validatedWrite
+        let writeValidatedData =    
+            validateRequest ctx
+            >> bind (validatedWrite decodeData writeData)
      
         e.Message
         |> writeValidatedData

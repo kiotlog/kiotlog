@@ -1,16 +1,17 @@
 namespace Decoder
 
+open System
 open Microsoft.EntityFrameworkCore
 
 open Chessie.ErrorHandling
 
 open KiotlogDB
-open System
+open Request
 
 module Catalog =
 
-    let getDevices (ctx : KiotlogDBContext)  =
-        ctx.Devices
+    let getDevices (dbCtx : KiotlogDBContext)  =
+        dbCtx.Devices
             .Include("Sensors")
             .Include("Sensors.SensorType")
             .Include("Sensors.Conversion")
@@ -64,14 +65,22 @@ module Catalog =
         
         validateFmtString device
 
-    let writePoint cs device time flags (data, _) =
-        use ctx = new KiotlogDBContext(cs)
+    let writePoint cs (ctx, _) =
+
+        let _, _, device = ctx.TopicParts
+        use dbCtx = new KiotlogDBContext(cs)
 
         Points (
             DeviceDevice = device,
-            Time = time,
-            Flags = flags,
-            Data = data )
-        |> ctx.Points.Add |> ignore
+            Time = ctx.Datetime.Value,
+            Flags = ctx.Flags.Value,
+            Data = ctx.Data.Value )
+        |> dbCtx.Points.Add |> ignore
     
-        ctx.SaveChanges() |> ignore
+        dbCtx.SaveChanges() |> ignore
+    
+    let validatedWrite decode write (c : Context) =
+        c
+        |> decode
+        |> successTee write
+        |> log "decode"
