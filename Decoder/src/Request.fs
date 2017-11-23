@@ -74,32 +74,6 @@ module Request =
         
         eitherTee success failure twoTrackInput
 
-    // let logDecode twoTrackInput =
-    //     let now = DateTime.Now.ToUniversalTime()
-        
-    //     let success (x, _) =
-    //         let data = x.Data.Value
-    //         let _, _, device = x.TopicParts
-    //         printfn "DECODING - [%A] [%s] %A" now device data
-
-    //     let failure msgs =
-    //         eprintfn "DECODING - [%A] ERRORS: %A" now msgs
-        
-    //     eitherTee success failure twoTrackInput
-
-    // let logRequest twoTrackInput =
-    //     let now = DateTime.Now.ToUniversalTime()
-
-    //     let success (x, _) =
-    //         let req = x.Request.Value.ToString(Formatting.None)
-    //         let _, _, device = x.TopicParts
-    //         printfn "REQUEST - [%A] [%s] %A" now device req
-
-    //     let failure msgs =
-    //         eprintfn "REQUEST - [%A] ERRORS %A" now msgs
-
-    //     eitherTee success failure twoTrackInput
-
     let validateRequest c =
         validateMsg c
         >> bind validateMeta
