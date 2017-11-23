@@ -33,4 +33,5 @@ module Conversions =
         | "float_to_uint8" -> uint8ToFloat value max min
         | "x10" -> xMul 10. value max min
         | "x100" -> xMul 100. value max min
+        | "x1000" -> xMul 1000. value max min
         | _ -> float value
