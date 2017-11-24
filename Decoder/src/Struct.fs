@@ -236,7 +236,7 @@ module Struct =
         |> List.map sizeOfAtom
         |> List.reduce (+)
 
-    let unpack (fmt : string) (data : byte []) (* : list<PackedValue> *)=
+    let unpack (fmt : string) (data : byte []) =
 
         let _unpack (dataLen : int) =
             use dataStream = new MemoryStream(dataLen)
@@ -254,9 +254,7 @@ module Struct =
             |> explodeFormatString
             |> stripEndiannessChar
             |> unpackData
-            // |> ok
         
         checkMatchingSize data.Length (calcsize fmt)
         |> lift _unpack
-        // >> returnOrFail
         
