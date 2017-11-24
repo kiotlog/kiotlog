@@ -65,7 +65,7 @@ module Catalog =
         
         validateFmtString device
 
-    let writePoint cs (ctx, _) =
+    let writePoint cs (ctx : Context, _) =
 
         let _, _, device = ctx.TopicParts.Value
         use dbCtx = new KiotlogDBContext(cs)
@@ -79,8 +79,3 @@ module Catalog =
     
         dbCtx.SaveChanges() |> ignore
     
-    let validatedWrite decode write (c : Context) =
-        c
-        |> decode
-        |> successTee write
-        |> log "decode"
