@@ -26,7 +26,6 @@ module Decoder =
         FmtString : string option
 
         Unpacked : PackedValue list option
-
         Data : Dictionary<string, float> option
     }
 
@@ -76,9 +75,7 @@ module Decoder =
     
     let private unpackStruct dtx =
         let channel, _, device = dtx.Ctx.TopicParts.Value
-        let payload =
-            dtx.Ctx.PayloadRaw.Value
-            |> strToByteArray channel
+        let payload = strToByteArray channel dtx.Ctx.PayloadRaw.Value
         match unpack dtx.FmtString.Value payload with
         | Ok (x, _) -> ok { dtx with Unpacked = Some x }
         | Bad msgs -> fail (sprintf "[%s]" device::msgs)
@@ -90,15 +87,14 @@ module Decoder =
 
     let klDecode (cs : string) ctx =
 
-        let decoding =
-            {
-                Ctx = ctx
-                Device = None
-                Sensors = None
-                FmtString = None
-                Unpacked = None
-                Data = None
-            }
+        let decoding = {
+            Ctx = ctx
+            Device = None
+            Sensors = None
+            FmtString = None
+            Unpacked = None
+            Data = None
+        }
 
         use dbCtx = new KiotlogDBContext(cs)
         let devices = getDevices dbCtx
