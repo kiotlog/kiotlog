@@ -18,10 +18,15 @@ open uPLibrary.Networking.M2Mqtt.Exceptions
 open Chessie.ErrorHandling
 
 open Decoder
-open Catalog
 open Request
 
 module Mqtt =
+
+    let private validateTopicParts topic c =
+        let m = Regex(@"/(\S+)/(\S+)/devices/(\S+)/up").Match(topic)
+        if m.Success then
+           ok { c with TopicParts = Some (m.Groups.[1].Value, m.Groups.[2].Value, m.Groups.[3].Value) }
+        else fail "Unable to parse topic parts."
 
     let msgReceivedHandler decodeData writeData (e: MqttMsgPublishEventArgs) =
 
@@ -37,19 +42,15 @@ module Mqtt =
             Data = None
         }
 
-        let validateTopicParts topic c =
-            let m = Regex(@"/(\S+)/(\S+)/devices/(\S+)/up").Match(topic)
-            if m.Success
-                then
-                   ok { c with TopicParts = Some (m.Groups.[1].Value, m.Groups.[2].Value, m.Groups.[3].Value) }
-                else
-                    fail "Unable to parse topic parts."
-
+        let validateTopicParts =
+            validateTopicParts e.Topic
 
         let writeValidatedData =
-            validateTopicParts e.Topic
+            validateTopicParts
             >> bind validateRequest
-            >> bind (validatedWrite decodeData writeData)
+            >> bind decodeData
+            >> successTee writeData
+            >> log "decode"
      
         ctx
         |> writeValidatedData
