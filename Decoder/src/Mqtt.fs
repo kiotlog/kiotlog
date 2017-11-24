@@ -36,7 +36,7 @@ module Mqtt =
 
             Request = None
             PayloadRaw = None
-            
+
             Datetime = None
             Flags = None
             Data = None
@@ -51,7 +51,7 @@ module Mqtt =
             >> bind decodeData
             >> successTee writeData
             >> log "decode"
-     
+
         ctx
         |> writeValidatedData
         |> ignore

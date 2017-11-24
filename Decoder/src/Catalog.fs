@@ -15,7 +15,7 @@ module Catalog =
             .Include("Sensors")
             .Include("Sensors.SensorType")
             .Include("Sensors.Conversion")
-    
+
     let getDevice devId (devices : Linq.IQueryable<Devices>)  =
         try
             query {
@@ -28,18 +28,18 @@ module Catalog =
             | :? InvalidOperationException as ex ->
                 sprintf "Device %s not found. [%s]" devId ex.Message
                 |> fail
-       
+
     let getSortedSensors (device : Devices) =
-        try 
+        try
             device.Sensors
             |> Seq.sortBy (fun sensor -> sensor.Fmt.Index) |> ok
         with
             | :? ArgumentException as ex ->
-                sprintf "Sensors not found for %s. [%s]" device.Device ex.Message                
+                sprintf "Sensors not found for %s. [%s]" device.Device ex.Message
                 |> fail
 
     let getFormatString (device : Devices) =
-        let endianness = 
+        let endianness =
             try
                 if device.Frame.Bigendian then ">" else "<"
             with
@@ -54,15 +54,15 @@ module Catalog =
             |> Seq.map (fun (sensor : Sensors) -> sensor.Fmt.FmtChr)
             |> Seq.reduce (+)
             |> ok
-        
+
         let buildFmtString endianness fmt =
             endianness + fmt |> ok
-        
+
         let validateFmtString =
             getSortedSensors
             >> bind fmtString
             >> bind (buildFmtString endianness)
-        
+
         validateFmtString device
 
     let writePoint cs (ctx : Context, _) =
@@ -76,6 +76,5 @@ module Catalog =
             Flags = ctx.Flags.Value,
             Data = ctx.Data.Value )
         |> dbCtx.Points.Add |> ignore
-    
+
         dbCtx.SaveChanges() |> ignore
-    

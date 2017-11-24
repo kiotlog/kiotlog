@@ -29,7 +29,7 @@ module Decoder =
         Data : Dictionary<string, float> option
     }
 
-    let private strToByteArray channel = 
+    let private strToByteArray channel =
         match channel with
         | "sigfox" -> byteArrayFromHexString
         | "lorawan" -> Convert.FromBase64String
@@ -46,17 +46,17 @@ module Decoder =
         match payload with
         | [] -> fail "Empty Payload"
         | _ ->
-            let decodedDict = new Dictionary<string, float>()            
+            let decodedDict = new Dictionary<string, float>()
             List.iter2
                 (fun (s : Sensors) p ->
                     decodedDict.[s.Meta.Name] <- doConvert p s)
-                sensors payload 
+                sensors payload
 
             ok decodedDict
 
     let private serializeData dtx =
         JsonConvert.SerializeObject(dtx.Data.Value, Formatting.None)
-    
+
     let private getDevice devices dtx =
         let _, _, device = dtx.Ctx.TopicParts.Value
         match getDevice device devices with
@@ -72,7 +72,7 @@ module Decoder =
         match getFormatString dtx.Device.Value with
         | Ok (x, _) -> ok { dtx with FmtString = Some x }
         | Bad msgs -> fail msgs
-    
+
     let private unpackStruct dtx =
         let channel, _, device = dtx.Ctx.TopicParts.Value
         let payload = strToByteArray channel dtx.Ctx.PayloadRaw.Value
@@ -106,7 +106,7 @@ module Decoder =
             >> bind unpackStruct
             >> bind convertFields
             >> lift serializeData
-        
+
         match decode decoding with
         | Ok (x, _) -> ok { ctx with Data = Some x }
         | Bad msgs -> fail (sprintf "Decoding failed: %A" msgs)
