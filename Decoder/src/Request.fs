@@ -11,7 +11,9 @@ open Helpers
 module Request =
 
     type Context = {
-        TopicParts : string * string * string
+        Msg : byte [] option
+        TopicParts : (string * string * string) option
+
         Request : JObject option
         PayloadRaw : string option
 
@@ -20,9 +22,9 @@ module Request =
         Data : string option
     }
 
-    let validateMsg ctx (m : byte []) =
+    let validateMsg ctx =
         try
-            let json = m |> decode |> JObject.Parse
+            let json = ctx.Msg.Value |> decode |> JObject.Parse
             ok { ctx with Request = Some json }
         with | :? JsonException -> fail "Invalid JSON"
 
@@ -35,7 +37,7 @@ module Request =
     let validateTime ctx =
         try
             let time = ctx.Request.Value.["metadata"].["time"] |> string
-            let channel, _, _ = ctx.TopicParts
+            let channel, _, _ = ctx.TopicParts.Value
             let dateTime =
                 match channel with
                 | "sigfox" -> unixTimeStampToDateTime(int64 time)
@@ -66,7 +68,7 @@ module Request =
                 | "request" -> x.Request.Value.ToString(Formatting.None)
                 | _ -> "Hello, World!"
 
-            let _, _, device = x.TopicParts
+            let _, _, device = x.TopicParts.Value
             printfn "%s - [%A] [%s] %A" header now device msg
 
         let failure msgs =
@@ -74,8 +76,8 @@ module Request =
         
         eitherTee success failure twoTrackInput
 
-    let validateRequest c =
-        validateMsg c
+    let validateRequest =
+        validateMsg
         >> bind validateMeta
         >> bind validateTime
         >> bind validatePayloadRaw

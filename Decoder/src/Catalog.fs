@@ -67,7 +67,7 @@ module Catalog =
 
     let writePoint cs (ctx, _) =
 
-        let _, _, device = ctx.TopicParts
+        let _, _, device = ctx.TopicParts.Value
         use dbCtx = new KiotlogDBContext(cs)
 
         Points (

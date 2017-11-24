@@ -66,7 +66,7 @@ module Decoder =
     
     let klDecode (cs : string) ctx =
 
-        let channel, _, device = ctx.TopicParts
+        let channel, _, device = ctx.TopicParts.Value
 
         use dbCtx = new KiotlogDBContext(cs)
         let devices = getDevices dbCtx
@@ -80,7 +80,7 @@ module Decoder =
         
         let data =
             let success (x, _) = x
-            let failure msgs = eprintfn "%A" msgs; ""
+            let failure msgs = eprintfn "%A" msgs; "{}"
 
             ctx.PayloadRaw.Value
             |> validatedDecode

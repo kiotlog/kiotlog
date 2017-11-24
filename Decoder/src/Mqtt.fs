@@ -25,14 +25,10 @@ module Mqtt =
 
     let msgReceivedHandler decodeData writeData (e: MqttMsgPublishEventArgs) =
 
-        let topicParts =
-            let m = Regex(@"/(\S+)/(\S+)/devices/(\S+)/up").Match(e.Topic)
-            if m.Success
-                then m.Groups.[1].Value, m.Groups.[2].Value, m.Groups.[3].Value
-                else ("", "", "")
-
         let ctx = {
-            TopicParts = topicParts
+            Msg = Some e.Message
+            TopicParts = None
+
             Request = None
             PayloadRaw = None
             
@@ -41,11 +37,21 @@ module Mqtt =
             Data = None
         }
 
-        let writeValidatedData =    
-            validateRequest ctx
+        let validateTopicParts topic c =
+            let m = Regex(@"/(\S+)/(\S+)/devices/(\S+)/up").Match(topic)
+            if m.Success
+                then
+                   ok { c with TopicParts = Some (m.Groups.[1].Value, m.Groups.[2].Value, m.Groups.[3].Value) }
+                else
+                    fail "Unable to parse topic parts."
+
+
+        let writeValidatedData =
+            validateTopicParts e.Topic
+            >> bind validateRequest
             >> bind (validatedWrite decodeData writeData)
      
-        e.Message
+        ctx
         |> writeValidatedData
         |> ignore
 
