@@ -1,8 +1,7 @@
-module Decoder.Program
+namespace Decoder
 
 open System.Threading
 
-// open uPLibrary.Networking.M2Mqtt
 open uPLibrary.Networking.M2Mqtt.Messages
 
 open Arguments
@@ -10,30 +9,31 @@ open Mqtt
 open Decoder
 open Catalog
 
-[<EntryPoint>]
-let main argv =
-    let mainConfig = parseCLI argv
+module Program =
 
-    let decodePayload =
-        klDecode mainConfig.PostgresConnectionString
+    [<EntryPoint>]
+    let main argv =
+        let mainConfig = parseCLI argv
 
-    let writePayload =
-        writePoint mainConfig.PostgresConnectionString
+        let decodePayload =
+            decodePayload mainConfig.PostgresConnectionString
 
-    let mqttTopics, mqttQosLevels =
-        mainConfig.Topics |> List.toArray,
-        [| for _ in mainConfig.Topics -> MqttMsgBase.QOS_LEVEL_AT_MOST_ONCE |]
+        let writePoint =
+            writePoint mainConfig.PostgresConnectionString
 
-    let mqttClient = mqttConnect mainConfig.MQTTBroker
+        let mqttTopics, mqttQosLevels =
+            mainConfig.Topics |> List.toArray,
+            [| for _ in mainConfig.Topics -> MqttMsgBase.QOS_LEVEL_AT_MOST_ONCE |]
 
-    let msgReceived = msgReceivedHandler decodePayload writePayload
+        let mqttClient = mqttConnect mainConfig.MQTTBroker
 
-    mqttClient.MqttMsgPublishReceived.Add msgReceived
-    mqttClient.MqttMsgSubscribed.Add msgSubscribed
-    
-    mqttClient.Subscribe (mqttTopics, mqttQosLevels) |> ignore
+        let msgReceived = msgReceivedHandler decodePayload writePoint
 
-    Thread.Sleep Timeout.Infinite
+        mqttClient.MqttMsgPublishReceived.Add msgReceived
+        mqttClient.MqttMsgSubscribed.Add msgSubscribed
 
-    0
+        mqttClient.Subscribe (mqttTopics, mqttQosLevels) |> ignore
 
+        Thread.Sleep Timeout.Infinite
+
+        0

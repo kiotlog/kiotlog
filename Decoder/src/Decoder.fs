@@ -85,7 +85,7 @@ module Decoder =
         | Ok (x, _) -> ok { dtx with Data = Some x }
         | Bad msgs -> fail msgs
 
-    let klDecode (cs : string) ctx =
+    let decodePayload (cs : string) ctx =
 
         let decoding = {
             Ctx = ctx
