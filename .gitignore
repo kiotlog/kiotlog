@@ -1,5 +1,3 @@
-libsodium-core
-libsodium-net
 .idea
 .vscode
 **/bin
