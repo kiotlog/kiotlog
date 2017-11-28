@@ -7,6 +7,7 @@ open Sodium
 open KiotlogDB
 open Catalog
 open SnPacket
+open Helpers
 
 module Klsn =
 
@@ -22,7 +23,7 @@ module Klsn =
         }
 
     let log what twoTrackInput =
-        let now = DateTime.Now.ToUniversalTime()
+        let now = DateTime.Now.ToUniversalTime().ToString("o")
 
         let header =
             match what with
@@ -31,14 +32,28 @@ module Klsn =
             | _ -> "NONE"
 
         let success (x, _) =
+            let topic =
+                let channel, app, device = x.TopicParts.Value
+                sprintf "/%s/%s/%s" channel app device
+
+            let message, nonce, data, time, payload =
+                        x.Msg.Value |> hexStringFromByteArray,
+                        x.Packet.Value.Nonce |> hexStringFromByteArray,
+                        x.Packet.Value.Data |> hexStringFromByteArray,
+                        x.Time.Value.ToString("o"),
+                        x.Payload.Value |> Convert.ToBase64String
+
             let msg =
                 match what with
                 | "payload" -> x.Payload.Value |> Convert.ToBase64String
-                | "request" -> x.ToString()
+                | "request" ->
+                    sprintf
+                        "{ topic: %s, message: %s, nonce: %s, data: %s, time: %A, payload: %s }"
+                        topic message nonce data time payload
                 | _ -> "Hello, World!"
 
             let _, _, device = x.TopicParts.Value
-            printfn "%s - [%A] [%s] %A" header now device msg
+            printfn "%s - [%s] [%s] %A" header now device msg
 
         let failure msgs =
             eprintfn "%s - [%A] ERRORS: %A" header now msgs
