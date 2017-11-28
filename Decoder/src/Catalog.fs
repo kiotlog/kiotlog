@@ -50,10 +50,15 @@ module Catalog =
                     "<"
 
         let fmtString sensors =
-            sensors
-            |> Seq.map (fun (sensor : Sensors) -> sensor.Fmt.FmtChr)
-            |> Seq.reduce (+)
-            |> ok
+            try
+                sensors
+                |> Seq.map (fun (sensor : Sensors) -> sensor.Fmt.FmtChr)
+                |> Seq.reduce (+)
+                |> ok
+            with
+                | :? ArgumentException as ex ->
+                    sprintf "Unable to get format string for %s. [%s]" device.Device ex.Message
+                    |> fail
 
         let buildFmtString endianness fmt =
             endianness + fmt |> ok
