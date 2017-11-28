@@ -1,4 +1,4 @@
-namespace Decoder
+namespace KlsnReceiver
 
 open System
 open System.IO
