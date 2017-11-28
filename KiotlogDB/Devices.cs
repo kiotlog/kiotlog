@@ -20,6 +20,10 @@ namespace KiotlogDB
             public class BasicAuth {
                 public string Token { get; set; }
             }
+            public KlsnAuth Klsn {get; set; }
+            public class KlsnAuth {
+                public string Key { get; set; }
+            }
         }
 
         public class JsonBFrame
@@ -31,7 +35,7 @@ namespace KiotlogDB
         public Guid Id { get; set; }
         public string Device { get; set; }
         public string Meta { get; set; }
-        
+
         internal string _Auth { get; set; }
         internal string _Frame { get; set; }
 
