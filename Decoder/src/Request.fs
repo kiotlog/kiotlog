@@ -40,7 +40,7 @@ module Request =
             let channel, _, _ = ctx.TopicParts.Value
             let dateTime =
                 match channel with
-                | "sigfox" -> unixTimeStampToDateTime(int64 time)
+                | "sigfox" | "klsn" -> unixTimeStampToDateTime(int64 time)
                 | "lorawan" -> DateTime.Parse(time).ToUniversalTime()
                 | _ -> DateTime.UtcNow
             ok { ctx with Datetime = Some dateTime}
@@ -60,7 +60,7 @@ module Request =
             | "decode" -> "DECODE"
             | "request" -> "REQUEST"
             | _ -> "NONE"
-        
+
         let success (x, _) =
             let msg =
                 match what with
@@ -73,7 +73,7 @@ module Request =
 
         let failure msgs =
             eprintfn "%s - [%A] ERRORS: %A" header now msgs
-        
+
         eitherTee success failure twoTrackInput
 
     let validateRequest =
