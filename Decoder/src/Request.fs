@@ -53,7 +53,7 @@ module Request =
         with | :? JsonException -> fail "Payload not found"
 
     let log what twoTrackInput =
-        let now = DateTime.Now.ToUniversalTime()
+        let now = DateTime.Now.ToUniversalTime().ToString("o")
 
         let header =
             match what with
@@ -69,10 +69,10 @@ module Request =
                 | _ -> "Hello, World!"
 
             let _, _, device = x.TopicParts.Value
-            printfn "%s - [%A] [%s] %A" header now device msg
+            printfn "%s - [%s] [%s] %A" header now device msg
 
         let failure msgs =
-            eprintfn "%s - [%A] ERRORS: %A" header now msgs
+            eprintfn "%s - [%s] ERRORS: %A" header now msgs
 
         eitherTee success failure twoTrackInput
 
