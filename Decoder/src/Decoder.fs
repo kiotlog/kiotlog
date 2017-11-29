@@ -3,6 +3,8 @@ namespace Decoder
 open System
 open System.Collections.Generic
 
+open Microsoft.EntityFrameworkCore
+
 open Newtonsoft.Json
 open Chessie.ErrorHandling
 
@@ -96,7 +98,10 @@ module Decoder =
             Data = None
         }
 
-        use dbCtx = new KiotlogDBContext(cs)
+        let optionsBuilder = DbContextOptionsBuilder<KiotlogDBContext>()
+        optionsBuilder.UseNpgsql(cs) |> ignore
+
+        use dbCtx = new KiotlogDBContext(optionsBuilder.Options)
         let devices = getDevices dbCtx
 
         let decode =

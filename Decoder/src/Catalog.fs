@@ -70,10 +70,14 @@ module Catalog =
 
         validateFmtString device
 
-    let writePoint cs (ctx : Context, _) =
+    let writePoint (cs : string) (ctx : Context, _) =
 
         let _, _, device = ctx.TopicParts.Value
-        use dbCtx = new KiotlogDBContext(cs)
+
+        let optionsBuilder = DbContextOptionsBuilder<KiotlogDBContext>()
+        optionsBuilder.UseNpgsql(cs) |> ignore
+
+        use dbCtx = new KiotlogDBContext(optionsBuilder.Options)
 
         Points (
             DeviceDevice = device,

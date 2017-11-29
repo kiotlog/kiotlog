@@ -2,6 +2,7 @@ namespace KlsnReceiver
 
 open System
 open Chessie.ErrorHandling
+open Microsoft.EntityFrameworkCore
 
 open Sodium
 open KiotlogDB
@@ -60,8 +61,12 @@ module Klsn =
 
         eitherTee success failure twoTrackInput
 
-    let parseRequest cs ctx =
-        use dbCtx = new KiotlogDBContext(cs)
+    let parseRequest (cs : string) ctx =
+
+        let optionsBuilder = DbContextOptionsBuilder<KiotlogDBContext>()
+        optionsBuilder.UseNpgsql(cs) |> ignore
+
+        use dbCtx = new KiotlogDBContext(optionsBuilder.Options)
 
         let devices = getDevices dbCtx
 
