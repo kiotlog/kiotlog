@@ -1,0 +1,20 @@
+version: "3"
+
+services:
+  Decoder:
+    image: kiotlog/decoder
+    build:
+      context: .
+      dockerfile: Decoder/Dockerfile
+
+  HttpReceiver:
+    image: kiotlog/httpreceiver
+    build:
+      context: .
+      dockerfile: HttpReceiver/Dockerfile
+
+  KlsnReceiver:
+    image: kiotlog/klsnreceiver
+    build:
+      context: .
+      dockerfile: KlsnReceiver/Dockerfile
