@@ -6,25 +6,20 @@ namespace KiotlogDB
 {
     public partial class KiotlogDBContext : DbContext
     {
-        private string ConnectionString;
-
         public virtual DbSet<Conversions> Conversions { get; set; }
         public virtual DbSet<Devices> Devices { get; set; }
         public virtual DbSet<Points> Points { get; set; }
         public virtual DbSet<Sensors> Sensors { get; set; }
         public virtual DbSet<SensorTypes> SensorTypes { get; set; }
 
-        public KiotlogDBContext(string connectionString)
-        {
-            ConnectionString = connectionString;
-        }
+        public KiotlogDBContext(DbContextOptions<KiotlogDBContext> dbContextOptions)
+            :base(dbContextOptions)
+        { }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
-            {
-                optionsBuilder.UseNpgsql(ConnectionString);
-            }
+            { }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -80,7 +75,7 @@ namespace KiotlogDB
                     .HasColumnName("frame")
                     .HasColumnType("jsonb")
                     .HasDefaultValueSql("'{\"bigendian\": true, \"bitfields\": false}'::jsonb");
-                
+
                 entity.Property(e => e.Meta)
                     .IsRequired()
                     .HasColumnName("meta")
