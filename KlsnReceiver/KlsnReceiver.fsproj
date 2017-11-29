@@ -10,7 +10,6 @@
   <ItemGroup>
     <Compile Include="src/Helpers.fs" />
     <Compile Include="src/Arguments.fs" />
-    <Compile Include="src/Struct.fs" />
     <Compile Include="src/Catalog.fs" />
     <Compile Include="src/Parser.fs" />
     <Compile Include="src/Klsn.fs" />
