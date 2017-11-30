@@ -10,7 +10,6 @@ open WebParts
 open MQTT
 open CliArguments
 open Helpers
-open HttpReceiver.Catalog
 
 [<EntryPoint>]
 let main argv =
