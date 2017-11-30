@@ -58,10 +58,10 @@ module Mqtt =
 
     let rec mqttConnect (broker : string, port) : MqttClient =
         let client = MqttClient (broker, port, false, null, null, MqttSslProtocols.None)
+        let clientId = "KlsnReceiver/" + Guid.NewGuid().ToString()
 
         try
-            client.Connect (Guid.NewGuid().ToString())
-            |> function
+            match client.Connect clientId with
             | MqttMsgConnack.CONN_REFUSED_PROT_VERS -> failwith "Invalid Protocol Version"
             | MqttMsgConnack.CONN_REFUSED_IDENT_REJECTED -> failwith "Identity Rejected"
             | MqttMsgConnack.CONN_REFUSED_SERVER_UNAVAILABLE -> failwith "Server Unavailable"
