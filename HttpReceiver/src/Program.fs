@@ -10,6 +10,7 @@ open WebParts
 open MQTT
 open CliArguments
 open Helpers
+open HttpReceiver.Catalog
 
 [<EntryPoint>]
 let main argv =
@@ -42,9 +43,12 @@ let main argv =
                     fromSigFoxPart
             ]
         ]
-    
+
+    let getDeviceBasicAuth =
+        getDeviceBasicAuth mainConfig.PostgresConnectionString
+
     let checkToken =
-        checkToken (getDeviceBasicAuth mainConfig.PostgresConnectionString)
+        checkToken getDeviceBasicAuth
 
     let app =
         Authentication.authenticateBasic
