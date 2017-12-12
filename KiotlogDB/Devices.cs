@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 using Newtonsoft.Json;
@@ -33,6 +34,7 @@ namespace KiotlogDB
         }
 
         public Guid Id { get; set; }
+        [Required(ErrorMessage="The Device field is required")]
         public string Device { get; set; }
         public string Meta { get; set; }
 
@@ -54,6 +56,8 @@ namespace KiotlogDB
         }
 
         public ICollection<Points> Points { get; set; }
+        
+        [NotNullOrEmptyCollection(ErrorMessage="We need at leat one Sensor")]
         public ICollection<Sensors> Sensors { get; set; }
     }
 }

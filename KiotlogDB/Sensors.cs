@@ -39,8 +39,11 @@ namespace KiotlogDB
             set { _Fmt = value == null ? null : JsonConvert.SerializeObject(value, JsonSettings.snakeSettings); }
         }
 
+        [JsonIgnore]
         public Guid? ConversionId { get; set; }
+        [JsonIgnore]
         public Guid? SensorTypeId { get; set; }
+        [JsonIgnore]
         public Guid DeviceId { get; set; }
 
         public Conversions Conversion { get; set; }
