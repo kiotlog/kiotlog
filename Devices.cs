@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 
 namespace KiotlogDB
 {
+    [Table("devices")]
     public partial class Devices
     {
         public Devices()
@@ -33,12 +34,23 @@ namespace KiotlogDB
             public string Bitfields { get; set; }
         }
 
+        [Column("id")]
         public Guid Id { get; set; }
+
         [Required(ErrorMessage="The Device field is required")]
+        [Column("device")]
         public string Device { get; set; }
+
+        [Required]
+        [Column("meta", TypeName = "jsonb")]
         public string Meta { get; set; }
 
+        [Required]
+        [Column("auth", TypeName = "jsonb")]
         internal string _Auth { get; set; }
+
+        [Required]
+        [Column("frame", TypeName = "jsonb")]
         internal string _Frame { get; set; }
 
         [NotMapped]
@@ -55,9 +67,21 @@ namespace KiotlogDB
             set { _Frame = value == null ? null : JsonConvert.SerializeObject(value); }
         }
 
+        [InverseProperty("Device")]
         public ICollection<Points> Points { get; set; }
         
         [NotNullOrEmptyCollection(ErrorMessage="We need at leat one Sensor")]
+        [InverseProperty("Device")]
         public ICollection<Sensors> Sensors { get; set; }
+
+        public bool ShouldSerializePoints()
+        {
+            return Points != null && Points.Count > 0;
+        }
+
+        public bool ShouldSerializeSensors()
+        {
+            return Sensors != null && Sensors.Count > 0;
+        }
     }
 }
