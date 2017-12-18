@@ -79,8 +79,16 @@ module Catalog =
 
         use dbCtx = new KiotlogDBContext(optionsBuilder.Options)
 
+        // TODO: check if device was not found
+        let devId = query {
+                        for d in dbCtx.Devices do
+                        where (d.Device = device)
+                        select d.Id
+                        exactlyOne
+                    }
+
         Points (
-            DeviceDevice = device,
+            DeviceId = devId,
             Time = ctx.Datetime.Value,
             Flags = ctx.Flags.Value,
             Data = ctx.Data.Value )
