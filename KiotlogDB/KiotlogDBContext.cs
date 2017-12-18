@@ -28,9 +28,8 @@ namespace KiotlogDB
 
             modelBuilder.Entity<Conversions>(entity =>
             {
-                entity.HasIndex(e => e.Id)
-                    .HasName("conversions_id_key")
-                    .IsUnique();
+                entity.HasKey(e => e.Id)
+                    .HasName("convertions_pkey");
 
                 entity.Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
 
@@ -39,12 +38,11 @@ namespace KiotlogDB
 
             modelBuilder.Entity<Devices>(entity =>
             {
+                entity.HasKey(e => e.Id)
+                    .HasName("devices_pkey");
+
                 entity.HasIndex(e => e.Device)
                     .HasName("devices_device_key")
-                    .IsUnique();
-
-                entity.HasIndex(e => e.Id)
-                    .HasName("devices_id_key")
                     .IsUnique();
 
                 entity.Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
@@ -58,6 +56,9 @@ namespace KiotlogDB
 
             modelBuilder.Entity<Points>(entity =>
             {
+                entity.HasKey(e => e.Id)
+                    .HasName("points_pkey");
+
                 entity.Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
 
                 entity.Property(e => e.Data).HasDefaultValueSql("'{}'::jsonb");
@@ -75,9 +76,8 @@ namespace KiotlogDB
 
             modelBuilder.Entity<Sensors>(entity =>
             {
-                entity.HasIndex(e => e.Id)
-                    .HasName("sensors_id_key")
-                    .IsUnique();
+                entity.HasKey(e => e.Id)
+                    .HasName("sensors_pkey");
 
                 entity.Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
 
@@ -103,9 +103,8 @@ namespace KiotlogDB
 
             modelBuilder.Entity<SensorTypes>(entity =>
             {
-                entity.HasIndex(e => e.Id)
-                    .HasName("sensor_types_id_key")
-                    .IsUnique();
+                entity.HasKey(e => e.Id)
+                    .HasName("sensor_types_pkey");
 
                 entity.HasIndex(e => e.Name)
                     .HasName("sensor_types_name_key")
