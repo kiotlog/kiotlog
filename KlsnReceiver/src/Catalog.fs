@@ -22,6 +22,11 @@ module Catalog =
                 select d
                 exactlyOne
             } |> ok
+
+            // devices.SingleAsync(fun d -> d.Device = devId)
+            // |> Async.AwaitTask
+            // |> Async.RunSynchronously
+            // |> ok
         with
             | :? InvalidOperationException as ex ->
                 sprintf "Device %s not found. [%s]" devId ex.Message

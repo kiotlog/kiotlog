@@ -56,30 +56,38 @@ module Mqtt =
         with
         | :? MqttClientException as ex -> fail ex.Message
 
-    let rec mqttConnect (broker : string, port) : MqttClient =
-        let client = MqttClient (broker, port, false, null, null, MqttSslProtocols.None)
-        let clientId = "KlsnReceiver/" + Guid.NewGuid().ToString()
-
+    let private tryConnect (client: MqttClient) clientId =
         try
             match client.Connect clientId with
-            | MqttMsgConnack.CONN_REFUSED_PROT_VERS -> failwith "Invalid Protocol Version"
-            | MqttMsgConnack.CONN_REFUSED_IDENT_REJECTED -> failwith "Identity Rejected"
-            | MqttMsgConnack.CONN_REFUSED_SERVER_UNAVAILABLE -> failwith "Server Unavailable"
-            | MqttMsgConnack.CONN_REFUSED_USERNAME_PASSWORD -> failwith "Invalid Username or Password"
-            | MqttMsgConnack.CONN_REFUSED_NOT_AUTHORIZED -> failwith "Client Not Authorized"
-            | MqttMsgConnack.CONN_ACCEPTED -> client
-            | _ -> failwith "Unable to connect: Unknown Connack Type"
+            | MqttMsgConnack.CONN_REFUSED_PROT_VERS -> fail "Invalid Protocol Version"
+            | MqttMsgConnack.CONN_REFUSED_IDENT_REJECTED -> fail "Identity Rejected"
+            | MqttMsgConnack.CONN_REFUSED_SERVER_UNAVAILABLE -> fail "Server Unavailable"
+            | MqttMsgConnack.CONN_REFUSED_USERNAME_PASSWORD -> fail "Invalid Username or Password"
+            | MqttMsgConnack.CONN_REFUSED_NOT_AUTHORIZED -> fail "Client Not Authorized"
+            | MqttMsgConnack.CONN_ACCEPTED -> ok client
+            | _ -> fail "Unable to connect: Unknown Connack Type"
         with
-            | :? MqttConnectionException ->
-                eprintfn "Connection failed. Retrying in 10 seconds."
-                Thread.Sleep 10000
-                mqttConnect (broker, port)
+            | :? MqttConnectionException as ex ->
+                fail ex.Message
 
-    // let connectionClosedHandler (client: MqttClient) parameters (e: EventArgs) =
-    //     eprintfn "Broker connection closed: trying to reconnect [%A]" e
-    //     try
-    //         mqttConnect client parameters |> ignore
-    //     with
-    //     | :? MqttConnectionException ->
-    //             Thread.Sleep 10
-    //             mqttConnect client parameters |> ignore
+    let rec mqttConnect (broker : string, port) clientId =
+        let client = MqttClient (broker, port, false, null, null, MqttSslProtocols.None)
+
+        match tryConnect client clientId with
+        | Ok (client, _) ->
+            printfn "Connected."
+            client
+        | Bad msg ->
+            eprintfn "Connection failed. Retrying in 1 second. [%A]" msg
+            Thread.Sleep 1000
+            mqttConnect (broker, port) clientId
+
+    let rec mqttClosed client clientId e =
+        eprintfn "Broker closed connection: trying to reconnect."
+        match tryConnect client clientId with
+        | Ok _ ->
+            printfn "Connected."
+        | Bad msg ->
+            eprintfn "Re-opening closed connection failed. Retrying in 1 second. [%A]" msg
+            Thread.Sleep 1000
+            mqttClosed client clientId e
