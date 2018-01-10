@@ -20,6 +20,4 @@ RUN apt update \
         libicu57 libcurl3 libunwind8 libssl1.0 \
     && rm -rf /var/lib/apt/lists/*
 COPY --from=build-env /Sln/HttpReceiver/out ./
-COPY HttpReceiver/docker-entrypoint.sh /
-# ENTRYPOINT ["/docker-entrypoint.sh" ]
 ENTRYPOINT ["/App/HttpReceiver" ]
