@@ -1,9 +1,4 @@
-﻿namespace KlsnReceiver
-
-open System
-open System.Threading
-
-(*
+﻿(*
     Copyright (C) 2017 Giampaolo Mancini, Trampoline SRL.
     Copyright (C) 2017 Francesco Varano, Trampoline SRL.
 
@@ -22,6 +17,11 @@ open System.Threading
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *)
+
+namespace KlsnReceiver
+
+open System
+open System.Threading
 
 open uPLibrary.Networking.M2Mqtt.Messages
 
