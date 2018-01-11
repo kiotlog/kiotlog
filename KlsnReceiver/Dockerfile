@@ -1,4 +1,4 @@
-FROM microsoft/dotnet-nightly:2.1-sdk AS build-env
+FROM microsoft/dotnet:2.0-sdk AS build-env
 WORKDIR /Sln
 
 #######################################################
@@ -12,7 +12,7 @@ RUN dotnet restore
 
 # RUN dotnet publish -c Release -r linux-x64 -o out /p:ShowLinkerSizeComparison=true
 WORKDIR /Sln/${PROJECT}
-RUN dotnet publish -c Release --no-restore -r linux-x64 -o out /p:LinkDuringPublish=false /p:ShowLinkerSizeComparison=true
+RUN dotnet publish -c Release -r linux-x64 -o out /p:LinkDuringPublish=false /p:ShowLinkerSizeComparison=true
 
 # build runtime image
 FROM debian:stretch-slim
