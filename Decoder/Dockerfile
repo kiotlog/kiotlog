@@ -12,7 +12,7 @@ RUN dotnet restore
 
 # RUN dotnet publish -c Release -r linux-x64 -o out /p:ShowLinkerSizeComparison=true
 WORKDIR /Sln/${PROJECT}
-RUN dotnet publish -c Release -r linux-x64 -o out /p:LinkDuringPublish=false /p:ShowLinkerSizeComparison=true
+RUN dotnet publish -c Release --no-restore -r linux-x64 -o out /p:LinkDuringPublish=false /p:ShowLinkerSizeComparison=true
 
 # build runtime image
 FROM debian:stretch-slim
