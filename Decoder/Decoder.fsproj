@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -26,6 +26,7 @@
   <ItemGroup>
     <PackageReference Include="Argu" Version="4.2.1" />
     <PackageReference Include="Chessie" Version="0.6.0" />
+    <PackageReference Include="FSharp.Core" Version="4.2.3" />
     <PackageReference Include="ILLink.Tasks" Version="0.1.4-preview-981901" />
     <PackageReference Include="m2mqttdotnetcore" Version="1.0.7" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.0.1" />
