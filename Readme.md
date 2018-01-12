@@ -28,3 +28,8 @@ In order to run the Kiotlog platform, you need at least pre-configured instances
 
 6.  Platform will start receiving data from Kiotlog test devices via The Things Network.
 7.  Connect to [Local Grafana](http://localhost:3000) and create your dashboard or import the demo dashboard provided at [Dockerfiles/grafana/Kiotlog Demo.json](https://raw.githubusercontent.com/kiotlog/dockerfiles/master/grafana/Kiotlog%20Demo.json).
+
+# Configuring Kiotlog for SigFox (HTTP) and LoRaWAN (MQTT)
+
+Please, go to [Wiki](https://github.com/kiotlog/kiotlog/wiki).
+
