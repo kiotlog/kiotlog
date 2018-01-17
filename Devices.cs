@@ -35,11 +35,12 @@ namespace KiotlogDB
             Points = new HashSet<Points>();
             Sensors = new HashSet<Sensors>();
         }
-        
+
         public class JsonBMeta
         {
             public string Name { get; set; }
             public string Description { get; set; }
+            public string Kind { get; set; }
         }
 
         public class JsonBAuth
@@ -66,7 +67,7 @@ namespace KiotlogDB
         [Required(ErrorMessage="The Device field is required")]
         [Column("device")]
         public string Device { get; set; }
-        
+
         [Required]
         [Column("meta", TypeName = "jsonb")]
         internal string _Meta { get; set; }
@@ -78,12 +79,12 @@ namespace KiotlogDB
         [Required]
         [Column("frame", TypeName = "jsonb")]
         internal string _Frame { get; set; }
-        
+
         [NotMapped]
         public JsonBMeta Meta
         {
-            get { return _Meta == null ? null : JsonConvert.DeserializeObject<JsonBMeta>(_Meta, JsonSettings.snakeSettings); }
-            set { _Meta = value == null ? null : JsonConvert.SerializeObject(value, JsonSettings.snakeSettings); }
+            get { return _Meta == null ? null : JsonConvert.DeserializeObject<JsonBMeta>(_Meta); }
+            set { _Meta = value == null ? null : JsonConvert.SerializeObject(value); }
         }
 
         [NotMapped]
