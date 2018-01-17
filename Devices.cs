@@ -42,6 +42,13 @@ namespace KiotlogDB
             public string Description { get; set; }
         }
 
+        public class JsonBMeta
+        {
+            public string Name { get; set; }
+            public string Description { get; set; }
+            public string Kind { get; set; }
+        }
+
         public class JsonBAuth
         {
             public BasicAuth Basic { get; set; }
@@ -84,6 +91,13 @@ namespace KiotlogDB
         {
             get { return _Meta == null ? null : JsonConvert.DeserializeObject<JsonBMeta>(_Meta, JsonSettings.snakeSettings); }
             set { _Meta = value == null ? null : JsonConvert.SerializeObject(value, JsonSettings.snakeSettings); }
+        }
+
+        [NotMapped]
+        public JsonBMeta Meta
+        {
+            get { return _Meta == null ? null : JsonConvert.DeserializeObject<JsonBMeta>(_Meta); }
+            set { _Meta = value == null ? null : JsonConvert.SerializeObject(value); }
         }
 
         [NotMapped]
