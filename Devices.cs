@@ -58,7 +58,7 @@ namespace KiotlogDB
         public class JsonBFrame
         {
             public bool Bigendian { get; set; }
-            public string Bitfields { get; set; }
+            public bool Bitfields { get; set; }
         }
 
         [Column("id")]
