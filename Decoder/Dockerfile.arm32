@@ -11,10 +11,11 @@ COPY . .
 RUN dotnet restore
 
 WORKDIR /Sln/${PROJECT}
-RUN dotnet publish -c Release --no-restore -r linux-arm -o out /p:LinkDuringPublish=false /p:ShowLinkerSizeComparison=true
+RUN dotnet publish -c Release -r linux-arm -o out /p:LinkDuringPublish=false /p:ShowLinkerSizeComparison=true
 
 # build runtime image
 FROM arm32v7/debian:stretch-slim
+COPY qemu-arm-static /usr/bin/qemu-arm-static
 
 #######################################################
 # WARINING!
