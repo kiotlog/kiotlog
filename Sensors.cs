@@ -66,13 +66,21 @@ namespace KiotlogDB
             set { _Fmt = value == null ? null : JsonConvert.SerializeObject(value, JsonSettings.snakeSettings); }
         }
 
-        [JsonIgnore]
         [Column("conversion_id")]
         public Guid? ConversionId { get; set; }
 
-        [JsonIgnore]
+        public bool ShouldSerializeConversionId ()
+        {
+            return false;
+        }
+
         [Column("sensor_type_id")]
         public Guid? SensorTypeId { get; set; }
+
+        public bool ShouldSerializeSensorTypeId ()
+        {
+            return false;
+        }
 
         [JsonIgnore]
         [Column("device_id")]
