@@ -77,12 +77,6 @@ namespace KiotlogDB
         [Column("sensor_type_id")]
         public Guid? SensorTypeId { get; set; }
 
-        public bool ShouldSerializeSensorTypeId ()
-        {
-            return false;
-        }
-
-        [JsonIgnore]
         [Column("device_id")]
         public Guid DeviceId { get; set; }
 

@@ -71,7 +71,7 @@ namespace KiotlogDB
 
                 entity.Property(e => e._Frame).HasDefaultValueSql("'{\"bigendian\": true, \"bitfields\": false}'::jsonb");
 
-                entity.Property(e => e._Meta).HasDefaultValueSql("'{}'::jsonb");
+                entity.Property(e => e._Meta).HasDefaultValueSql("json_build_object('klsn', json_build_object('key', encode(gen_random_bytes(32), 'base64')), 'basic', json_build_object('token', encode(gen_random_bytes(32), 'base64')))");
             });
 
             modelBuilder.Entity<Points>(entity =>

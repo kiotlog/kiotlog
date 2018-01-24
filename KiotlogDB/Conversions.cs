@@ -42,5 +42,10 @@ namespace KiotlogDB
 
         [InverseProperty("Conversion")]
         public ICollection<Sensors> Sensors { get; set; }
+
+        public bool ShouldSerializeSensors()
+        {
+            return Sensors != null && Sensors.Count > 0;
+        }
     }
 }
