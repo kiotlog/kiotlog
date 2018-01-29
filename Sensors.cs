@@ -69,10 +69,10 @@ namespace KiotlogDB
         [Column("conversion_id")]
         public Guid? ConversionId { get; set; }
 
-        public bool ShouldSerializeConversionId ()
-        {
-            return false;
-        }
+        // public bool ShouldSerializeConversionId ()
+        // {
+        //     return false;
+        // }
 
         [Column("sensor_type_id")]
         public Guid? SensorTypeId { get; set; }
@@ -83,6 +83,10 @@ namespace KiotlogDB
         [ForeignKey("ConversionId")]
         [InverseProperty("Sensors")]
         public Conversions Conversion { get; set; }
+        public bool ShouldSerializeConversion ()
+        {
+            return false;
+        }
 
         [ForeignKey("DeviceId")]
         [InverseProperty("Sensors")]
@@ -91,5 +95,9 @@ namespace KiotlogDB
         [ForeignKey("SensorTypeId")]
         [InverseProperty("Sensors")]
         public SensorTypes SensorType { get; set; }
+        public bool ShouldSerializeSensorType ()
+        {
+            return false;
+        }
     }
 }
