@@ -26,7 +26,7 @@ open Newtonsoft.Json.Linq
 
 open Chessie.ErrorHandling
 
-open Helpers
+open Decoder.Helpers
 
 module Request =
 

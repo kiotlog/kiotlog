@@ -28,15 +28,15 @@ open Microsoft.EntityFrameworkCore
 open Newtonsoft.Json
 open Chessie.ErrorHandling
 
-open Struct
-open PackedValue
+open Decoder.Struct
+open Decoder.PackedValue
 
-open Helpers
-open Conversions
+open Decoder.Helpers
+open Decoder.Conversions
 
-open KiotlogDB
-open Catalog
-open Request
+open KiotlogDBF
+open Decoder.Catalog
+open Decoder.Request
 
 module Decoder =
 
@@ -118,10 +118,10 @@ module Decoder =
             Data = None
         }
 
-        let optionsBuilder = DbContextOptionsBuilder<KiotlogDBContext>()
+        let optionsBuilder = DbContextOptionsBuilder<KiotlogDBFContext>()
         optionsBuilder.UseNpgsql(cs) |> ignore
 
-        use dbCtx = new KiotlogDBContext(optionsBuilder.Options)
+        use dbCtx = new KiotlogDBFContext(optionsBuilder.Options)
         let devices = getDevices dbCtx
 
         let decode =

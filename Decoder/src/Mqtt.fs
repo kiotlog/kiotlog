@@ -30,8 +30,8 @@ open uPLibrary.Networking.M2Mqtt.Exceptions
 
 open Chessie.ErrorHandling
 
-open Decoder
-open Request
+// open Decoder.Decoder
+open Decoder.Request
 
 module Mqtt =
 
