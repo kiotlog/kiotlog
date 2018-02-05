@@ -6,8 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- <ProjectReference Include="..\KiotlogDB\KiotlogDB.csproj" /> -->
-    <ProjectReference Include="..\KiotlogDBF\KiotlogDBF.fsproj" />
+    <ProjectReference Include="..\KiotlogDB\KiotlogDB.csproj" />
   </ItemGroup>
 
   <ItemGroup>

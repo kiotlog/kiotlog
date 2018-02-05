@@ -25,14 +25,14 @@ open Microsoft.EntityFrameworkCore
 
 open Chessie.ErrorHandling
 
-open KiotlogDBF
-open Decoder.Request
+open KiotlogDB
+open Request
 
 module Catalog =
 
-    let getDevices (dbCtx : KiotlogDBFContext)  =
+    let getDevices (dbCtx : KiotlogDBContext)  =
         dbCtx.Devices
-            // .Include("Sensors")
+            .Include("Sensors")
             .Include("Sensors.SensorType")
             .Include("Sensors.Conversion")
 
@@ -94,10 +94,10 @@ module Catalog =
 
         let _, _, device = ctx.TopicParts.Value
 
-        let optionsBuilder = DbContextOptionsBuilder<KiotlogDBFContext>()
+        let optionsBuilder = DbContextOptionsBuilder<KiotlogDBContext>()
         optionsBuilder.UseNpgsql(cs) |> ignore
 
-        use dbCtx = new KiotlogDBFContext(optionsBuilder.Options)
+        use dbCtx = new KiotlogDBContext(optionsBuilder.Options)
 
         // TODO: check if device was not found
         let devId = query {
