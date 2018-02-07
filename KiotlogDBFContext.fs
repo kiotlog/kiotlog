@@ -65,9 +65,9 @@ type KiotlogDBFContext (dbContextOptions: DbContextOptions<KiotlogDBFContext>) =
                 entity.HasKey("Id").HasName("devices_pkey") |> ignore
                 entity.HasIndex("Device").HasName("devices_device_key").IsUnique |> ignore
                 entity.Property("Id").HasDefaultValueSql("gen_random_uuid()") |> ignore
-                entity.Property("auth").HasDefaultValueSql("'{}'::jsonb") |> ignore
-                entity.Property("frame").HasDefaultValueSql("'{\"bigendian\": true, \"bitfields\": false}'::jsonb") |> ignore
-                entity.Property("meta").HasDefaultValueSql("json_build_object('klsn', json_build_object('key', encode(gen_random_bytes(32), 'base64')), 'basic', json_build_object('token', encode(gen_random_bytes(32), 'base64')))") |> ignore
+                entity.Property("_meta").HasDefaultValueSql("json_build_object('klsn', json_build_object('key', encode(gen_random_bytes(32), 'base64')), 'basic', json_build_object('token', encode(gen_random_bytes(32), 'base64')))") |> ignore
+                entity.Property("_auth").HasDefaultValueSql("'{}'::jsonb") |> ignore
+                entity.Property("_frame").HasDefaultValueSql("'{\"bigendian\": true, \"bitfields\": false}'::jsonb") |> ignore
         ) |> ignore
 
         modelBuilder.Entity<Points>(
@@ -85,8 +85,8 @@ type KiotlogDBFContext (dbContextOptions: DbContextOptions<KiotlogDBFContext>) =
             fun entity ->
                 entity.HasKey("Id").HasName("sensors_pkey") |> ignore
                 entity.Property("Id").HasDefaultValueSql("gen_random_uuid()")  |> ignore
-                entity.Property("fmt").HasDefaultValueSql("'{}'::jsonb")  |> ignore
-                entity.Property("meta").HasDefaultValueSql("'{}'::jsonb")  |> ignore
+                entity.Property("_fmt").HasDefaultValueSql("'{}'::jsonb")  |> ignore
+                entity.Property("_meta").HasDefaultValueSql("'{}'::jsonb")  |> ignore
                 entity.HasOne(fun s -> s.Device).WithMany("Sensors").HasForeignKey("DeviceId").HasConstraintName("sensors_device_id_fkey") |> ignore
                 entity.HasOne(fun s -> s.SensorType).WithMany("Sensors").HasForeignKey("SensorTypeId").HasConstraintName("sensors_sensor_type_fkey")  |> ignore
                 entity.HasOne(fun s -> s.Conversion).WithMany("Sensors").HasForeignKey("ConversionId").HasConstraintName("sensors_conversion_fkey") |> ignore
@@ -97,7 +97,7 @@ type KiotlogDBFContext (dbContextOptions: DbContextOptions<KiotlogDBFContext>) =
                 entity.HasKey("Id").HasName("sensor_types_pkey") |> ignore
                 entity.HasIndex("Name").HasName("sensor_types_name_key").IsUnique()  |> ignore
                 entity.Property("Id").HasDefaultValueSql("gen_random_uuid()")  |> ignore
-                entity.Property("meta").HasDefaultValueSql("'{}'::jsonb")  |> ignore
+                entity.Property("_meta").HasDefaultValueSql("'{}'::jsonb")  |> ignore
                 entity.Property("Name").HasDefaultValueSql("'generic'::text") |> ignore
                 entity.Property("Type").HasDefaultValueSql("'generic'::text") |> ignore
         ) |> ignore
