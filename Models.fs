@@ -71,45 +71,50 @@ type SensorTypesMeta = {
     Min: int
 }
 
-type [<Table("devices")>] Devices () =
-
-    [<Column("id")>]
-    [<DefaultValue>] val mutable Id : Guid
-
-    [<Column("device")>]
-    [<Required(ErrorMessage="The Device field is Required")>]
-    [<DefaultValue>] val mutable Device : string
-
+[<AllowNullLiteral>]
+[<Table("devices")>]
+type Devices () =
     [<Column("meta", TypeName = "jsonb")>]
-    [<DefaultValue>] val mutable meta : string
-    [<NotMapped>]
-    member public this.Meta
-        with get () = JsonConvert.DeserializeObject<DevicesMeta>(this.meta)
-        and  set(value: DevicesMeta) = this.meta <- JsonConvert.SerializeObject(value)
+    let mutable meta = String.Empty
 
     [<Column("auth", TypeName = "jsonb")>]
-    [<DefaultValue>] val mutable auth : string
-    [<NotMapped>]
-    member this.Auth
-        with get () = JsonConvert.DeserializeObject<DevicesAuth>(this.auth)
-        and  set(value: DevicesAuth) = this.auth <- JsonConvert.SerializeObject(value)
+    let mutable auth = String.Empty
 
     [<Column("frame", TypeName = "jsonb")>]
-    [<DefaultValue>] val mutable frame : string
-    [<NotMapped>]
-    member this.Frame
-        with get () = JsonConvert.DeserializeObject<DevicesFrame>(this.frame)
-        and  set(value: DevicesFrame) = this.frame <- JsonConvert.SerializeObject(value)
+    let mutable frame = String.Empty
 
     [<NotMapped>]
     let mutable points = Unchecked.defaultof<ICollection<Points>>
+
+    [<Column("id")>]
+    member val Id = Guid.NewGuid() with get, set
+
+    [<Column("device")>]
+    [<Required(ErrorMessage="The Device field is Required")>]
+    member val Device = "" with get, set
+
+    [<NotMapped>]
+    member public this.Meta
+        with get () = JsonConvert.DeserializeObject<DevicesMeta>(meta)
+        and  set(value: DevicesMeta) = meta <- JsonConvert.SerializeObject(value)
+
+    [<NotMapped>]
+    member this.Auth
+        with get () = JsonConvert.DeserializeObject<DevicesAuth>(auth)
+        and  set(value: DevicesAuth) = auth <- JsonConvert.SerializeObject(value)
+
+    [<NotMapped>]
+    member this.Frame
+        with get () = JsonConvert.DeserializeObject<DevicesFrame>(frame)
+        and  set(value: DevicesFrame) = frame <- JsonConvert.SerializeObject(value)
+
     [<InverseProperty("Device")>]
     member __.Points
         with get() = points
         and set(value) = points <- value
 
     [<NotMapped>]
-    [<DefaultValue>] val mutable sensors : ICollection<Sensors>
+    [<DefaultValue>] val mutable internal sensors : ICollection<Sensors>
     // [<NotNullOrEmptyCollection(ErrorMessage="We need at leat one Sensor")>]
     [<InverseProperty("Device")>]
     member this.Sensors
@@ -126,27 +131,27 @@ type [<Table("devices")>] Devices () =
     static member public ShouldSerializepoints () = false
     static member public ShouldSerializePoints () = false
 
-and [<Table("points")>] Points() =
+and [<AllowNullLiteral>][<Table("points")>] Points() =
 
     [<Column("id")>]
-    [<DefaultValue>] val mutable Id : Guid
+    member val Id = Guid.NewGuid() with get, set
 
     [<Column("device_id")>]
-    [<DefaultValue>] val mutable DeviceId : Guid
+    member val DeviceId = Guid.NewGuid() with get, set
 
     [<Column("time", TypeName = "timestamptz")>]
-    [<DefaultValue>] val mutable Time : DateTime
+    member val Time = DateTime.Now with get, set
 
     [<Required>]
     [<Column("flags", TypeName = "jsonb")>]
-    [<DefaultValue>] val mutable Flags : string
+    member val Flags = "{}" with get, set
 
     [<Required>]
     [<Column("data", TypeName = "jsonb")>]
-    [<DefaultValue>] val mutable Data : string
+    member val Data = "{}" with get, set
 
     [<NotMapped>]
-    [<DefaultValue>] val mutable device : Devices
+    [<DefaultValue>] val mutable internal device : Devices
     [<ForeignKey("DeviceId")>]
     [<InverseProperty("Points")>]
     member this.Device
@@ -157,35 +162,36 @@ and [<Table("points")>] Points() =
         toJsonString this
 
 and [<Table("sensors")>] Sensors() =
-
-    [<Column("id")>]
-    [<DefaultValue>] val mutable Id : Guid
-
     [<Column("meta", TypeName = "jsonb")>]
-    [<DefaultValue>] val mutable meta : string
-    [<NotMapped>]
-    member public this.Meta
-        with get () = JsonConvert.DeserializeObject<SensorsMeta>(this.meta, snakeSettings)
-        and  set(value: SensorsMeta) = this.meta <- JsonConvert.SerializeObject(value, snakeSettings)
+    let mutable meta = String.Empty
 
     [<Column("fmt", TypeName = "jsonb")>]
-    [<DefaultValue>] val mutable fmt : string
+    let mutable fmt = String.Empty
+
+    [<Column("id")>]
+    member val Id = Guid.NewGuid() with get, set
+
+    [<NotMapped>]
+    member public this.Meta
+        with get () = JsonConvert.DeserializeObject<SensorsMeta>(meta, snakeSettings)
+        and  set(value: SensorsMeta) = meta <- JsonConvert.SerializeObject(value, snakeSettings)
+
     [<NotMapped>]
     member public this.Fmt
-        with get () = JsonConvert.DeserializeObject<SensorsFmt>(this.fmt, snakeSettings)
-        and  set(value: SensorsFmt) = this.fmt <- JsonConvert.SerializeObject(value, snakeSettings)
+        with get () = JsonConvert.DeserializeObject<SensorsFmt>(fmt, snakeSettings)
+        and  set(value: SensorsFmt) = fmt <- JsonConvert.SerializeObject(value, snakeSettings)
 
     [<Column("device_id")>]
-    [<DefaultValue>] val mutable DeviceId : Guid
+    member val DeviceId = Guid.NewGuid() with get, set
 
     [<Column("sensor_type_id")>]
-    [<DefaultValue>] val mutable SensorTypeId : Guid
+    member val SensorTypeId = Guid.NewGuid() with get, set
 
     [<Column("conversion_id")>]
-    [<DefaultValue>] val mutable ConversionId : Guid
+    member val ConversionId = Guid.NewGuid() with get, set
 
     [<NotMapped>]
-    [<DefaultValue>] val mutable device : Devices
+    [<DefaultValue>] val mutable internal device : Devices
     [<ForeignKey("DeviceId")>]
     [<InverseProperty("Sensors")>]
     member this.Device
@@ -193,7 +199,7 @@ and [<Table("sensors")>] Sensors() =
         and set(value) = this.device <- value
 
     [<NotMapped>]
-    [<DefaultValue>] val mutable sensortype : SensorTypes
+    [<DefaultValue>] val mutable internal sensortype : SensorTypes
     [<ForeignKey("SensorTypeId")>]
     [<InverseProperty("Sensors")>]
     member this.SensorType
@@ -201,7 +207,7 @@ and [<Table("sensors")>] Sensors() =
         and set(value) = this.sensortype <- value
 
     [<NotMapped>]
-    [<DefaultValue>] val mutable conversion : Conversions
+    [<DefaultValue>] val mutable internal conversion : Conversions
     [<ForeignKey("ConversionId")>]
     [<InverseProperty("Sensors")>]
     member this.Conversion
@@ -218,26 +224,27 @@ and [<Table("sensors")>] Sensors() =
 
 and [<Table("sensor_types")>] SensorTypes() =
 
+    [<Column("meta", TypeName = "jsonb")>]
+    let mutable meta = String.Empty
+
     [<Column("id")>]
-    [<DefaultValue>] val mutable Id : Guid
+    member val Id = Guid.NewGuid() with get, set
 
     [<Required>]
     [<Column("name")>]
-    [<DefaultValue>] val mutable Name : string
+    member val  Name = "" with get, set
 
     [<Required>]
     [<Column("type")>]
-    [<DefaultValue>] val mutable Type : string
+    member val Type = "" with get, set
 
-    [<Column("meta", TypeName = "jsonb")>]
-    [<DefaultValue>] val mutable meta : string
     [<NotMapped>]
     member public this.Meta
-        with get () = JsonConvert.DeserializeObject<SensorTypesMeta>(this.meta)
-        and  set(value: SensorTypesMeta) = this.meta <- JsonConvert.SerializeObject(value)
+        with get () = JsonConvert.DeserializeObject<SensorTypesMeta>(meta)
+        and  set(value: SensorTypesMeta) = meta <- JsonConvert.SerializeObject(value)
 
     [<NotMapped>]
-    [<DefaultValue>] val mutable sensors : ICollection<Sensors>
+    [<DefaultValue>] val mutable internal sensors : ICollection<Sensors>
     [<InverseProperty("SensorType")>]
     member this.Sensors
         with get() = this.sensors
@@ -253,14 +260,14 @@ and [<Table("sensor_types")>] SensorTypes() =
 and [<Table("conversions")>] Conversions() =
 
     [<Column("id")>]
-    [<DefaultValue>] val mutable Id : Guid
+    member val Id = Guid.NewGuid() with get, set
 
     [<Required>]
     [<Column("fun")>]
-    [<DefaultValue>] val mutable Fun : string
+    member val Fun = "" with get, set
 
     [<NotMapped>]
-    [<DefaultValue>] val mutable sensors : ICollection<Sensors>
+    [<DefaultValue>] val mutable internal sensors : ICollection<Sensors>
     [<InverseProperty("Conversion")>]
     member this.Sensors
         with get() = this.sensors
