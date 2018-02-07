@@ -72,7 +72,6 @@ type SensorTypesMeta = {
 }
 
 [<AllowNullLiteral>]
-[<AbstractClass>]
 [<Table("devices")>]
 type Devices () =
 
@@ -133,8 +132,7 @@ type Devices () =
     static member public ShouldSerializepoints () = false
     static member public ShouldSerializePoints () = false
 
-and [<AbstractClass>]
-    [<AllowNullLiteral>]
+and [<AllowNullLiteral>]
     [<Table("points")>]
     Points() =
 
@@ -166,8 +164,7 @@ and [<AbstractClass>]
     override this.ToString() =
         toJsonString this
 
-and [<AbstractClass>]
-    [<AllowNullLiteral>]
+and [<AllowNullLiteral>]
     [<Table("sensors")>]
     Sensors() =
 
@@ -231,8 +228,7 @@ and [<AbstractClass>]
     override this.ToString() =
         toJsonString this
 
-and [<AbstractClass>]
-    [<AllowNullLiteral>]
+and [<AllowNullLiteral>]
     [<Table("sensor_types")>]
     SensorTypes() =
 
@@ -269,8 +265,7 @@ and [<AbstractClass>]
     override this.ToString() =
         toJsonString this
 
-and [<AbstractClass>]
-    [<AllowNullLiteral>]
+and [<AllowNullLiteral>]
     [<Table("conversions")>]
     Conversions() =
 
