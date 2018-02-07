@@ -26,7 +26,7 @@ open Newtonsoft.Json.Serialization
 module Utils =
     let snakeSettings =
         JsonSerializerSettings (
-            NullValueHandling = NullValueHandling.Ignore,
+            // NullValueHandling = NullValueHandling.Ignore,
             MissingMemberHandling = MissingMemberHandling.Error,
             ContractResolver = DefaultContractResolver (
                 NamingStrategy = SnakeCaseNamingStrategy(true, false, false)
@@ -37,3 +37,8 @@ module Utils =
             entity,
             Formatting.Indented,
             JsonSerializerSettings(ReferenceLoopHandling = ReferenceLoopHandling.Ignore))
+
+    let jsonGetter<'T>(json) =
+            if isNull json
+            then box null :?> 'T
+            else JsonConvert.DeserializeObject<'T>(json, snakeSettings)
