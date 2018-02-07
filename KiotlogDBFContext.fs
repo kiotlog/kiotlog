@@ -28,23 +28,31 @@ type KiotlogDBFContext (dbContextOptions: DbContextOptions<KiotlogDBFContext>) =
     inherit DbContext (dbContextOptions)
 
     // https://stackoverflow.com/questions/26775760/how-to-create-a-virtual-record-field-for-entity-framework-lazy-loading
-    // abstract Devices : DbSet<Devices> with get, set
-    // default val Devices = ctx.Set<Devices>() with get, set
+    [<DefaultValue>] val mutable private devices : DbSet<Devices>
+    abstract member Devices : DbSet<Devices> with get, set
+    override this.Devices with get() = this.devices and set(value) = this.devices <- value
 
-    [<DefaultValue>] val mutable devices : DbSet<Devices>
-    member public this.Devices with get() = this.devices and set(value) = this.devices <- value
+    // abstract member Devices : DbSet<Devices> with get, set
+    // default val Devices = DbContext.Set<Devices>() with get, set
 
-    [<DefaultValue>] val mutable points : DbSet<Points>
-    member public this.Points with get() = this.points and set(value) = this.points <- value
+    // [<DefaultValue>] val mutable devices : DbSet<Devices>
+    // member public this.Devices with get() = this.devices and set(value) = this.devices <- value
 
-    [<DefaultValue>] val mutable sensors : DbSet<Sensors>
-    member public this.Sensors with get() = this.sensors and set(value) = this.sensors <- value
+    [<DefaultValue>] val mutable private points : DbSet<Points>
+    abstract Points : DbSet<Points> with get, set
+    override this.Points with get () = this.points and set(value) = this.points <- value
 
-    [<DefaultValue>] val mutable sensortypes : DbSet<SensorTypes>
-    member public this.SensorTypes with get() = this.sensortypes and set(value) = this.sensortypes <- value
+    [<DefaultValue>] val mutable private sensors : DbSet<Sensors>
+    abstract Sensors : DbSet<Sensors> with get, set
+    override this.Sensors with get() = this.sensors and set(value) = this.sensors <- value
+
+    [<DefaultValue>] val mutable private sensortypes : DbSet<SensorTypes>
+    abstract SensorTypes : DbSet<SensorTypes> with get, set
+    override this.SensorTypes with get() = this.sensortypes and set(value) = this.sensortypes <- value
 
     [<DefaultValue>] val mutable conversions : DbSet<Conversions>
-    member public this.Conversions with get() = this.conversions and set(value) = this.conversions <- value
+    abstract Conversions : DbSet<Conversions> with get, set
+    override this.Conversions with get() = this.conversions and set(value) = this.conversions <- value
 
     override __.OnConfiguring(optionsBuilder: DbContextOptionsBuilder) =
         if not optionsBuilder.IsConfigured then () else ()
