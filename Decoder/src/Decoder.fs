@@ -34,7 +34,7 @@ open PackedValue
 open Helpers
 open Conversions
 
-open KiotlogDB
+open KiotlogDBF
 open Catalog
 open Request
 
@@ -118,10 +118,10 @@ module Decoder =
             Data = None
         }
 
-        let optionsBuilder = DbContextOptionsBuilder<KiotlogDBContext>()
+        let optionsBuilder = DbContextOptionsBuilder<KiotlogDBFContext>()
         optionsBuilder.UseNpgsql(cs) |> ignore
 
-        use dbCtx = new KiotlogDBContext(optionsBuilder.Options)
+        use dbCtx = new KiotlogDBFContext(optionsBuilder.Options)
         let devices = getDevices dbCtx
 
         let decode =
