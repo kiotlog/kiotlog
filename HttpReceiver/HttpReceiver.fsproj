@@ -29,6 +29,6 @@
     <PackageReference Include="Suave" Version="2.3.0-beta3" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\KiotlogDB\KiotlogDB.csproj" />
+    <ProjectReference Include="..\KiotlogDBF\KiotlogDBF.fsproj" />
   </ItemGroup>
 </Project>

@@ -21,16 +21,16 @@
 namespace HttpReceiver
 
 open Microsoft.EntityFrameworkCore
-open KiotlogDB
+open KiotlogDBF
 
 module Catalog =
 
     let getDeviceBasicAuth (cs : string) devid tkn =
 
-        let optionsBuilder = DbContextOptionsBuilder<KiotlogDBContext>()
+        let optionsBuilder = DbContextOptionsBuilder<KiotlogDBFContext>()
         optionsBuilder.UseNpgsql(cs) |> ignore
 
-        use dbCtx = new KiotlogDBContext(optionsBuilder.Options)
+        use dbCtx = new KiotlogDBFContext(optionsBuilder.Options)
 
         let devices =
             query {
@@ -39,7 +39,7 @@ module Catalog =
                 select (d.Device, d.Auth)
             } |> Seq.toArray
 
-        let checkBasicAuth (device, auth: Devices.JsonBAuth) =
+        let checkBasicAuth (device, auth) =
             device = devid && auth.Basic.Token = tkn
 
         devices |> Seq.tryFind checkBasicAuth
