@@ -1,0 +1,34 @@
+@hostname = sigfox.ht.kl.eu.ngrok.io
+@app_id = 590754bb9e93a15e24b758ca
+@dev_id = 18A9E5
+@auth_tkn = MThBOUU1OmFmYTFkODc3LWY0ZjctNGIzOC1iNTU5LTQ4ZmQwMGQ5YWUxYg==
+
+POST http://{{hostname}}/sigfox/{{app_id}}/devices/{{dev_id}}/up HTTP/1.0
+Host : {{hostname}}
+Content-Type : application/json
+Authorization : Basic {{auth_tkn}}
+accept-encoding : gzip,deflate
+accept-charset : UTF-8;q=0.9,*;q=0.7
+accept-language : fr
+user-agent : SIGFOX
+
+{
+  "app_id": "{{app_id}}",
+  "dev_id": "{{dev_id}}",
+  "is_retry": false,
+  "payload_raw": "015138063aee0e1d0000",
+  "payload_fields": {},
+  "metadata": {
+    "time": {{$timestamp}},
+    "gateways": [
+      {
+        "rssi": -139.00,
+        "snr": 11.86,
+        "avg_snr": 25.20,
+        "gtw_id": "2293",
+        "latitude": 45.0,
+        "longitude": 8.0
+      }
+    ]
+  }
+}
