@@ -134,6 +134,7 @@ module PackedValue =
         member x.ToUInt64 () = toUInt64 x
         member x.ToFloat () = toFloat x
         member x.AdjustEndianNess () = adjustEndianNess x
+        // https://stackoverflow.com/questions/5312182/conversion-between-types-in-discriminated-unions
 
 module Struct =
 
