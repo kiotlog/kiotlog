@@ -18,8 +18,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *)
 
-namespace KiotlogDBF
+namespace KiotlogDBF.Context
 
+open KiotlogDBF.Models
 open Microsoft.EntityFrameworkCore
 
 // https://stackoverflow.com/questions/5423768/c-sharp-to-f-ef-code-first
@@ -65,9 +66,9 @@ type KiotlogDBFContext (dbContextOptions: DbContextOptions<KiotlogDBFContext>) =
                 entity.HasKey("Id").HasName("devices_pkey") |> ignore
                 entity.HasIndex("Device").HasName("devices_device_key").IsUnique |> ignore
                 entity.Property("Id").HasDefaultValueSql("gen_random_uuid()") |> ignore
-                entity.Property("_meta").HasDefaultValueSql("json_build_object('klsn', json_build_object('key', encode(gen_random_bytes(32), 'base64')), 'basic', json_build_object('token', encode(gen_random_bytes(32), 'base64')))") |> ignore
-                entity.Property("_auth").HasDefaultValueSql("'{}'::jsonb") |> ignore
-                entity.Property("_frame").HasDefaultValueSql("'{\"bigendian\": true, \"bitfields\": false}'::jsonb") |> ignore
+                entity.Property("_Meta").HasDefaultValueSql("json_build_object('klsn', json_build_object('key', encode(gen_random_bytes(32), 'base64')), 'basic', json_build_object('token', encode(gen_random_bytes(32), 'base64')))") |> ignore
+                entity.Property("_Auth").HasDefaultValueSql("'{}'::jsonb") |> ignore
+                entity.Property("_Frame").HasDefaultValueSql("'{\"bigendian\": true, \"bitfields\": false}'::jsonb") |> ignore
         ) |> ignore
 
         modelBuilder.Entity<Points>(
@@ -85,8 +86,8 @@ type KiotlogDBFContext (dbContextOptions: DbContextOptions<KiotlogDBFContext>) =
             fun entity ->
                 entity.HasKey("Id").HasName("sensors_pkey") |> ignore
                 entity.Property("Id").HasDefaultValueSql("gen_random_uuid()")  |> ignore
-                entity.Property("_fmt").HasDefaultValueSql("'{}'::jsonb")  |> ignore
-                entity.Property("_meta").HasDefaultValueSql("'{}'::jsonb")  |> ignore
+                entity.Property("_Fmt").HasDefaultValueSql("'{}'::jsonb")  |> ignore
+                entity.Property("_Meta").HasDefaultValueSql("'{}'::jsonb")  |> ignore
                 entity.HasOne(fun s -> s.Device).WithMany("Sensors").HasForeignKey("DeviceId").HasConstraintName("sensors_device_id_fkey") |> ignore
                 entity.HasOne(fun s -> s.SensorType).WithMany("Sensors").HasForeignKey("SensorTypeId").HasConstraintName("sensors_sensor_type_fkey")  |> ignore
                 entity.HasOne(fun s -> s.Conversion).WithMany("Sensors").HasForeignKey("ConversionId").HasConstraintName("sensors_conversion_fkey") |> ignore
@@ -97,9 +98,9 @@ type KiotlogDBFContext (dbContextOptions: DbContextOptions<KiotlogDBFContext>) =
                 entity.HasKey("Id").HasName("sensor_types_pkey") |> ignore
                 entity.HasIndex("Name").HasName("sensor_types_name_key").IsUnique()  |> ignore
                 entity.Property("Id").HasDefaultValueSql("gen_random_uuid()")  |> ignore
-                entity.Property("_meta").HasDefaultValueSql("'{}'::jsonb")  |> ignore
+                entity.Property("_Meta").HasDefaultValueSql("'{}'::jsonb")  |> ignore
                 entity.Property("Name").HasDefaultValueSql("'generic'::text") |> ignore
-                entity.Property("Type").HasDefaultValueSql("'generic'::text") |> ignore
+                entity.Property("Kind").HasDefaultValueSql("'generic'::text") |> ignore
         ) |> ignore
 
         modelBuilder.Entity<Conversions>(
@@ -108,3 +109,12 @@ type KiotlogDBFContext (dbContextOptions: DbContextOptions<KiotlogDBFContext>) =
                 entity.Property("Id").HasDefaultValueSql("gen_random_uuid()")  |> ignore
                 entity.Property("Fun").HasDefaultValueSql("'id'::text") |> ignore
         ) |> ignore
+
+// type KiotlogDBFContextFactory () =
+//     interface IDesignTimeDbContextFactory<KiotlogDBFContext> with
+//         member __.CreateDbContext(_args) =
+//             let optionsBuilder = DbContextOptionsBuilder<KiotlogDBFContext>()
+//             optionsBuilder.UseNpgsql(
+//                 "Host=localhost;Port=5432;Database=efcore;Username=postgres",
+//                 fun options -> options.MigrationsAssembly("KiotlogDBF.Migrations") |> ignore) |> ignore
+//             new KiotlogDBFContext(optionsBuilder.Options)
