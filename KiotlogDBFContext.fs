@@ -109,12 +109,3 @@ type KiotlogDBFContext (dbContextOptions: DbContextOptions<KiotlogDBFContext>) =
                 entity.Property("Id").HasDefaultValueSql("gen_random_uuid()")  |> ignore
                 entity.Property("Fun").HasDefaultValueSql("'id'::text") |> ignore
         ) |> ignore
-
-// type KiotlogDBFContextFactory () =
-//     interface IDesignTimeDbContextFactory<KiotlogDBFContext> with
-//         member __.CreateDbContext(_args) =
-//             let optionsBuilder = DbContextOptionsBuilder<KiotlogDBFContext>()
-//             optionsBuilder.UseNpgsql(
-//                 "Host=localhost;Port=5432;Database=efcore;Username=postgres",
-//                 fun options -> options.MigrationsAssembly("KiotlogDBF.Migrations") |> ignore) |> ignore
-//             new KiotlogDBFContext(optionsBuilder.Options)
