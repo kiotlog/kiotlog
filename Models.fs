@@ -27,10 +27,6 @@ open System.ComponentModel.DataAnnotations.Schema
 open Newtonsoft.Json
 
 open KiotlogDBF.Utils
-open System.Collections
-open System.Collections.Generic
-open System.Collections.Generic
-open System.Collections.Generic
 
 [<NotMapped>]
 type DevicesMeta = {
