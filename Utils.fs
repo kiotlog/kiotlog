@@ -37,7 +37,9 @@ module Utils =
         JsonConvert.SerializeObject(
             entity,
             Formatting.Indented,
-            JsonSerializerSettings(ReferenceLoopHandling = ReferenceLoopHandling.Ignore))
+            JsonSerializerSettings(
+                NullValueHandling = NullValueHandling.Ignore,
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore))
 
     let jsonGetter<'T>(json) =
             if isNull json
