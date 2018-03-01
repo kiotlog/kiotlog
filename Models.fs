@@ -26,32 +26,34 @@ open System.ComponentModel.DataAnnotations
 open System.ComponentModel.DataAnnotations.Schema
 open Newtonsoft.Json
 
-open KiotlogDBF.Utils
+open KiotlogDBF.Json
 
+[<AllowNullLiteral>]
 [<NotMapped>]
-type DevicesMeta = {
-    Name: string
-    Description: string
-    Kind: string
-}
+type DevicesMeta () =
+    member val Name = null with get, set
+    member val Description = null with get, set
+    member val Kind = null with get, set
 
+[<AllowNullLiteral>]
 [<NotMapped>]
-type DevicesAuth = {
-    Basic: BasicAuth
-    Klsn: KlsnAuth
-}
-and [<NotMapped>] BasicAuth = {
-    Token: string
-}
-and [<NotMapped>] KlsnAuth = {
-    Key: string
-}
+type DevicesAuth () =
+    member val Basic : BasicAuth = null with get, set
+    member val Klsn : KlsnAuth = null with get, set
+and [<AllowNullLiteral>]
+    [<NotMapped>]
+    BasicAuth () =
+    member val Token : string = null with get, set
+and [<AllowNullLiteral>]
+    [<NotMapped>]
+    KlsnAuth () =
+    member val Key : string = null with get, set
 
+[<AllowNullLiteral>]
 [<NotMapped>]
-type DevicesFrame = {
-    Bigendian: bool
-    Bitfields: bool
-}
+type DevicesFrame () =
+    member val Bigendian = false with get, set
+    member val Bitfields = false with get, set
 
 [<NotMapped>]
 type SensorsFmt = {
@@ -93,27 +95,18 @@ type Devices () =
 
     [<NotMapped>]
     member public this.Meta
-        with get () =
-            match this._Meta with
-            | null -> { Name = null ; Description = null ; Kind = null }
-            | _ -> JsonConvert.DeserializeObject<DevicesMeta>(this._Meta)
-        and  set(value: DevicesMeta) = this._Meta <- JsonConvert.SerializeObject(value)
+        with get () = jsonGetter<DevicesMeta> this._Meta
+        and set (value: DevicesMeta) = this._Meta <- jsonSetter<DevicesMeta> value
 
     [<NotMapped>]
     member this.Auth
-        with get () =
-            match this._Auth with
-            | null -> { Basic = { Token = null }; Klsn = { Key = null }}
-            | _ -> JsonConvert.DeserializeObject<DevicesAuth>(this._Auth)
-        and  set (value: DevicesAuth) = this._Auth <- JsonConvert.SerializeObject(value)
+        with get () = jsonGetter<DevicesAuth> this._Auth
+        and set value = this._Auth <- jsonSetter (value: DevicesAuth)
 
     [<NotMapped>]
     member this.Frame
-        with get () =
-            match this._Frame with
-            | null -> { Bigendian = true; Bitfields = false }
-            | _ -> JsonConvert.DeserializeObject<DevicesFrame>(this._Frame)
-        and  set (value: DevicesFrame) = this._Frame <- JsonConvert.SerializeObject(value)
+        with get () = jsonGetter<DevicesFrame> this._Frame
+        and set value = this._Frame <- jsonSetter<DevicesFrame> value
 
     [<InverseProperty("Device")>]
     member val Points = HashSet<Points>() :> ICollection<_> with get, set
@@ -162,28 +155,22 @@ and [<AllowNullLiteral>]
     Sensors() =
 
     [<Column("meta", TypeName = "jsonb")>]
-    member val internal _Meta = null with get, set
+    member val internal _Meta = String.Empty with get, set
 
     [<Column("fmt", TypeName = "jsonb")>]
-    member val internal _Fmt = null with get, set
+    member val internal _Fmt = String.Empty with get, set
 
     [<Column("id")>]
     member val Id = Guid.Empty with get, set
 
     [<NotMapped>]
     member public this.Meta
-        with get () =
-            match this._Meta with
-            | null -> { Description = null ; Name = null }
-            | _ -> JsonConvert.DeserializeObject<SensorsMeta>(this._Meta, snakeSettings)
+        with get () = JsonConvert.DeserializeObject<SensorsMeta>(this._Meta, snakeSettings)
         and  set (value: SensorsMeta) = this._Meta <- JsonConvert.SerializeObject(value, snakeSettings)
 
     [<NotMapped>]
     member public this.Fmt
-        with get () =
-            match this._Fmt with
-            | null -> { FmtChr = "B"; Index = 0}
-            | _ -> JsonConvert.DeserializeObject<SensorsFmt>(this._Fmt, snakeSettings)
+        with get () = JsonConvert.DeserializeObject<SensorsFmt>(this._Fmt, snakeSettings)
         and  set (value: SensorsFmt) = this._Fmt <- JsonConvert.SerializeObject(value, snakeSettings)
 
     [<Column("device_id")>]
@@ -215,7 +202,7 @@ and [<AllowNullLiteral>]
     SensorTypes() =
 
     [<Column("meta", TypeName = "jsonb")>]
-    member val _Meta = null with get, set
+    member val _Meta = String.Empty with get, set
 
     [<Column("id")>]
     member val Id = Guid.Empty with get, set
@@ -230,10 +217,7 @@ and [<AllowNullLiteral>]
 
     [<NotMapped>]
     member public this.Meta
-        with get () =
-            match this._Meta with
-            | null -> { Max = 100; Min = 0 }
-            | _ -> JsonConvert.DeserializeObject<SensorTypesMeta>(this._Meta)
+        with get () = JsonConvert.DeserializeObject<SensorTypesMeta>(this._Meta)
         and  set(value: SensorTypesMeta) = this._Meta <- JsonConvert.SerializeObject(value)
 
     [<InverseProperty("SensorType")>]
