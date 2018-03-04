@@ -25,7 +25,8 @@ open Microsoft.EntityFrameworkCore
 
 open Chessie.ErrorHandling
 
-open KiotlogDBF
+open KiotlogDBF.Context
+open KiotlogDBF.Models
 open Request
 
 module Catalog =
@@ -100,12 +101,13 @@ module Catalog =
         use dbCtx = new KiotlogDBFContext(optionsBuilder.Options)
 
         // TODO: check if device was not found
-        let devId = query {
-                        for d in dbCtx.Devices do
-                        where (d.Device = device)
-                        select d.Id
-                        exactlyOne
-                    }
+        let devId =
+            query {
+                for d in dbCtx.Devices do
+                where (d.Device = device)
+                select d.Id
+                exactlyOne
+            }
 
         Points (
             DeviceId = devId,

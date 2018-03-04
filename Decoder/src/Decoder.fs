@@ -34,7 +34,8 @@ open PackedValue
 open Helpers
 open Conversions
 
-open KiotlogDBF
+open KiotlogDBF.Context
+open KiotlogDBF.Models
 open Catalog
 open Request
 
