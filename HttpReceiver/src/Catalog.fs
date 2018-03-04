@@ -21,7 +21,8 @@
 namespace HttpReceiver
 
 open Microsoft.EntityFrameworkCore
-open KiotlogDBF
+open KiotlogDBF.Context
+open KiotlogDBF.Models
 
 module Catalog =
 
@@ -39,7 +40,7 @@ module Catalog =
                 select (d.Device, d.Auth)
             } |> Seq.toArray
 
-        let checkBasicAuth (device, auth) =
+        let checkBasicAuth (device, auth : DevicesAuth) =
             device = devid && auth.Basic.Token = tkn
 
         devices |> Seq.tryFind checkBasicAuth
