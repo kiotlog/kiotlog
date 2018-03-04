@@ -179,7 +179,6 @@ module Json =
             | null -> FSharpValue.MakeUnion(cases.[0], [||])
             | _ -> FSharpValue.MakeUnion(cases.[1], [|value|])
 
-
     let snakeSettings =
         JsonSerializerSettings (
             NullValueHandling = NullValueHandling.Include,
