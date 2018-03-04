@@ -179,27 +179,29 @@ module Json =
             | null -> FSharpValue.MakeUnion(cases.[0], [||])
             | _ -> FSharpValue.MakeUnion(cases.[1], [|value|])
 
-    let private baseSettings =
+    let snakeSettings =
         JsonSerializerSettings (
             NullValueHandling = NullValueHandling.Include,
             MissingMemberHandling = MissingMemberHandling.Error,
             ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-            Converters = [| OptionConverter(); DuConverter() |]
-        )
-
-    let snakeSettings =
-        baseSettings.ContractResolver <-
-            DefaultContractResolver (
-                NamingStrategy = SnakeCaseNamingStrategy()
+            Converters = [| OptionConverter(); DuConverter() |],
+            ContractResolver =
+                DefaultContractResolver (
+                    NamingStrategy = SnakeCaseNamingStrategy()
+                )
             )
-        baseSettings
 
     let camelSettings =
-        baseSettings.ContractResolver <-
-            DefaultContractResolver (
-                NamingStrategy = CamelCaseNamingStrategy()
+        JsonSerializerSettings (
+            NullValueHandling = NullValueHandling.Include,
+            MissingMemberHandling = MissingMemberHandling.Error,
+            ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+            Converters = [| OptionConverter(); DuConverter() |],
+            ContractResolver =
+                DefaultContractResolver (
+                    NamingStrategy = CamelCaseNamingStrategy()
+                )
             )
-        baseSettings
 
     let toJsonString entity =
         JsonConvert.SerializeObject(

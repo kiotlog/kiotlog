@@ -124,7 +124,7 @@ type Devices () =
 
 and [<AllowNullLiteral>]
     [<Table("points")>]
-    Points() =
+    Points () =
 
     [<Column("id")>]
     member val Id = Guid.Empty with get, set
@@ -145,7 +145,7 @@ and [<AllowNullLiteral>]
 
     [<ForeignKey("DeviceId")>]
     [<InverseProperty("Points")>]
-    member val Device = Devices() with get, set
+    member val Device : Devices = null with get, set
 
     override this.ToString() =
         toJsonString this
@@ -184,15 +184,15 @@ and [<AllowNullLiteral>]
 
     [<ForeignKey("DeviceId")>]
     [<InverseProperty("Sensors")>]
-    member val Device = Devices() with get, set
+    member val Device : Devices = null with get, set
 
     [<ForeignKey("SensorTypeId")>]
     [<InverseProperty("Sensors")>]
-    member val SensorType = null :> SensorTypes with get, set
+    member val SensorType : SensorTypes = null with get, set
 
     [<ForeignKey("ConversionId")>]
     [<InverseProperty("Sensors")>]
-    member val Conversion = null :> Conversions with get, set
+    member val Conversion : Conversions = null with get, set
 
     override this.ToString() =
         toJsonString this
