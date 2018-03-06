@@ -39,10 +39,12 @@ type DevicesMeta () =
 type DevicesAuth () =
     member val Basic : BasicAuth = null with get, set
     member val Klsn : KlsnAuth = null with get, set
+
 and [<AllowNullLiteral>]
     [<NotMapped>]
     BasicAuth () =
     member val Token : string = null with get, set
+
 and [<AllowNullLiteral>]
     [<NotMapped>]
     KlsnAuth () =
