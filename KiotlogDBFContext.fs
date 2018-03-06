@@ -20,14 +20,24 @@
 
 namespace KiotlogDBF.Context
 
-open KiotlogDBF.Models
-open Microsoft.EntityFrameworkCore
 open System.Collections.Generic
 
-// https://stackoverflow.com/questions/5423768/c-sharp-to-f-ef-code-first
+open KiotlogDBF.Models
+open KiotlogDBF.Json
+open Microsoft.EntityFrameworkCore
+// open Microsoft.EntityFrameworkCore.Storage.Converters
+// open Newtonsoft.Json
 
+
+// https://stackoverflow.com/questions/5423768/c-sharp-to-f-ef-code-first
 type KiotlogDBFContext (dbContextOptions: DbContextOptions<KiotlogDBFContext>) =
     inherit DbContext (dbContextOptions)
+
+    // let jsonConverter<'T> =
+    //     new ValueConverter<'T, string> (
+    //         (fun m -> JsonConvert.SerializeObject(m :> obj)),
+    //         (fun j -> JsonConvert.DeserializeObject<'T>(j))
+    //     )
 
     // https://stackoverflow.com/questions/26775760/how-to-create-a-virtual-record-field-for-entity-framework-lazy-loading
     [<DefaultValue>] val mutable private devices : DbSet<Devices>
@@ -67,9 +77,18 @@ type KiotlogDBFContext (dbContextOptions: DbContextOptions<KiotlogDBFContext>) =
                 entity.HasKey(fun d -> d.Id :> obj).HasName("devices_pkey") |> ignore
                 entity.HasIndex(fun d -> d.Device :> obj).HasName("devices_device_key").IsUnique |> ignore
                 entity.Property(fun d -> d.Id).HasDefaultValueSql("gen_random_uuid()") |> ignore
-                entity.Property(fun d -> d._Meta).HasDefaultValueSql("'{}'::jsonb") |> ignore
-                entity.Property(fun d -> d._Auth).HasDefaultValueSql("json_build_object('klsn', json_build_object('key', encode(gen_random_bytes(32), 'base64')), 'basic', json_build_object('token', encode(gen_random_bytes(32), 'base64')))") |> ignore
-                entity.Property(fun d -> d._Frame).HasDefaultValueSql("'{\"bigendian\": true, \"bitfields\": false}'::jsonb") |> ignore
+                // entity.Property(fun d -> d._Meta).HasDefaultValueSql("'{}'::jsonb") |> ignore
+                entity.Property(fun d -> d.Meta)
+                    .HasConversion(jsonConverter<DevicesMeta>)
+                    .HasDefaultValueSql("'{}'::jsonb") |> ignore
+                entity.Property(fun d -> d.Auth)
+                    .HasConversion(jsonConverter<DevicesAuth>)
+                    .HasDefaultValueSql("json_build_object('klsn', json_build_object('key', encode(gen_random_bytes(32), 'base64')), 'basic', json_build_object('token', encode(gen_random_bytes(32), 'base64')))") |> ignore
+                entity.Property(fun d -> d.Frame)
+                    .HasConversion(jsonConverter<DevicesFrame>)
+                    .HasDefaultValueSql("'{\"bigendian\": true, \"bitfields\": false}'::jsonb") |> ignore
+                // entity.Property(fun d -> d._Auth).HasDefaultValueSql("json_build_object('klsn', json_build_object('key', encode(gen_random_bytes(32), 'base64')), 'basic', json_build_object('token', encode(gen_random_bytes(32), 'base64')))") |> ignore
+                // entity.Property(fun d -> d._Frame).HasDefaultValueSql("'{\"bigendian\": true, \"bitfields\": false}'::jsonb") |> ignore
         ) |> ignore
 
         modelBuilder.Entity<Points>(
@@ -91,8 +110,12 @@ type KiotlogDBFContext (dbContextOptions: DbContextOptions<KiotlogDBFContext>) =
             fun entity ->
                 entity.HasKey(fun s -> s.Id :> obj).HasName("sensors_pkey") |> ignore
                 entity.Property(fun s -> s.Id).HasDefaultValueSql("gen_random_uuid()")  |> ignore
-                entity.Property(fun s -> s._Fmt).HasDefaultValueSql("'{}'::jsonb")  |> ignore
-                entity.Property(fun s -> s._Meta).HasDefaultValueSql("'{}'::jsonb")  |> ignore
+                entity.Property(fun s -> s.Fmt)
+                    .HasConversion(jsonConverter<SensorsFmt>)
+                    .HasDefaultValueSql("'{}'::jsonb")  |> ignore
+                entity.Property(fun s -> s.Meta)
+                    .HasConversion(jsonConverter<SensorsMeta>)                    
+                    .HasDefaultValueSql("'{}'::jsonb")  |> ignore
                 entity.HasOne(fun s -> s.Device)
                     .WithMany(fun (d : Devices) -> d.Sensors :> IEnumerable<Sensors>)
                     .HasForeignKey(fun (s : Sensors) -> s.DeviceId :> obj)
@@ -112,7 +135,9 @@ type KiotlogDBFContext (dbContextOptions: DbContextOptions<KiotlogDBFContext>) =
                 entity.HasKey(fun t -> t.Id :> obj).HasName("sensor_types_pkey") |> ignore
                 entity.HasIndex(fun t -> t.Name :> obj).HasName("sensor_types_name_key").IsUnique()  |> ignore
                 entity.Property(fun t -> t.Id).HasDefaultValueSql("gen_random_uuid()")  |> ignore
-                entity.Property(fun t -> t._Meta).HasDefaultValueSql("'{}'::jsonb")  |> ignore
+                entity.Property(fun t -> t.Meta)
+                    .HasConversion(jsonConverter<SensorTypesMeta>)                
+                    .HasDefaultValueSql("'{}'::jsonb")  |> ignore
                 entity.Property(fun t -> t.Name).HasDefaultValueSql("'generic'::text") |> ignore
                 entity.Property(fun t -> t.Kind).HasDefaultValueSql("'generic'::text") |> ignore
         ) |> ignore

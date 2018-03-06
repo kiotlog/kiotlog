@@ -24,7 +24,6 @@ open System
 open System.Collections.Generic
 open System.ComponentModel.DataAnnotations
 open System.ComponentModel.DataAnnotations.Schema
-open Newtonsoft.Json
 
 open KiotlogDBF.Json
 
@@ -55,36 +54,36 @@ type DevicesFrame () =
     member val Bigendian = false with get, set
     member val Bitfields = false with get, set
 
+[<AllowNullLiteral>]
 [<NotMapped>]
-type SensorsFmt = {
-    Index: int
-    FmtChr: string
-}
+type SensorsFmt () =
+    member val Index: int = 0 with get, set
+    member val FmtChr: string = null with get, set
 
+[<AllowNullLiteral>]
 [<NotMapped>]
-type SensorsMeta = {
-    Name: string
-    Description: string
-}
+type SensorsMeta () =
+    member val Name: string = null with get, set
+    member val Description: string = null with get, set
 
+[<AllowNullLiteral>]
 [<NotMapped>]
-type SensorTypesMeta = {
-    Max: int
-    Min: int
-}
+type SensorTypesMeta () =
+    member val Max: int = Int32.MaxValue with get, set
+    member val Min: int = Int32.MinValue with get, set
 
 [<AllowNullLiteral>]
 [<Table("devices")>]
 type Devices () =
 
     [<Column("meta", TypeName = "jsonb")>]
-    member val internal _Meta = null with get, set
+    member val Meta : DevicesMeta = null with get, set
 
     [<Column("auth", TypeName = "jsonb")>]
-    member val internal _Auth = null with get, set
+    member val Auth : DevicesAuth = null with get, set
 
     [<Column("frame", TypeName = "jsonb")>]
-    member val internal _Frame = null with get, set
+    member val Frame : DevicesFrame = null with get, set
 
     [<Column("id")>]
     member val Id = Guid.Empty with get, set
@@ -92,21 +91,6 @@ type Devices () =
     [<Column("device")>]
     [<Required(ErrorMessage="The Device field is Required")>]
     member val Device = String.Empty with get, set
-
-    [<NotMapped>]
-    member public this.Meta
-        with get () = jsonGetter<DevicesMeta> this._Meta
-        and set (value: DevicesMeta) = this._Meta <- jsonSetter<DevicesMeta> value
-
-    [<NotMapped>]
-    member this.Auth
-        with get () = jsonGetter<DevicesAuth> this._Auth
-        and set value = this._Auth <- jsonSetter (value: DevicesAuth)
-
-    [<NotMapped>]
-    member this.Frame
-        with get () = jsonGetter<DevicesFrame> this._Frame
-        and set value = this._Frame <- jsonSetter<DevicesFrame> value
 
     [<InverseProperty("Device")>]
     member val Points = HashSet<Points>() :> ICollection<_> with get, set
@@ -117,10 +101,11 @@ type Devices () =
     override this.ToString() =
         toJsonString this
 
-    static member public ShouldSerialize_Meta () = false
+    // static member public ShouldSerialize_Meta () = false
     static member public ShouldSerialize_Auth () = false
     static member public ShouldSerialize_Frame () = false
     static member public ShouldSerializePoints () = false
+    member public this.ShouldSerializeSensors () = not (Seq.isEmpty this.Sensors)
 
 and [<AllowNullLiteral>]
     [<Table("points")>]
@@ -155,23 +140,13 @@ and [<AllowNullLiteral>]
     Sensors() =
 
     [<Column("meta", TypeName = "jsonb")>]
-    member val internal _Meta = String.Empty with get, set
+    member val Meta : SensorsMeta = null with get, set
 
     [<Column("fmt", TypeName = "jsonb")>]
-    member val internal _Fmt = String.Empty with get, set
+    member val Fmt : SensorsFmt = null with get, set
 
     [<Column("id")>]
     member val Id = Guid.Empty with get, set
-
-    [<NotMapped>]
-    member public this.Meta
-        with get () = JsonConvert.DeserializeObject<SensorsMeta>(this._Meta, snakeSettings)
-        and  set (value: SensorsMeta) = this._Meta <- JsonConvert.SerializeObject(value, snakeSettings)
-
-    [<NotMapped>]
-    member public this.Fmt
-        with get () = JsonConvert.DeserializeObject<SensorsFmt>(this._Fmt, snakeSettings)
-        and  set (value: SensorsFmt) = this._Fmt <- JsonConvert.SerializeObject(value, snakeSettings)
 
     [<Column("device_id")>]
     member val DeviceId = Guid.Empty with get, set
@@ -202,7 +177,7 @@ and [<AllowNullLiteral>]
     SensorTypes() =
 
     [<Column("meta", TypeName = "jsonb")>]
-    member val _Meta = String.Empty with get, set
+    member val Meta : SensorTypesMeta = null with get, set
 
     [<Column("id")>]
     member val Id = Guid.Empty with get, set
@@ -214,11 +189,6 @@ and [<AllowNullLiteral>]
     [<Required>]
     [<Column("kind")>]
     member val Kind = String.Empty with get, set
-
-    [<NotMapped>]
-    member public this.Meta
-        with get () = JsonConvert.DeserializeObject<SensorTypesMeta>(this._Meta)
-        and  set(value: SensorTypesMeta) = this._Meta <- JsonConvert.SerializeObject(value)
 
     [<InverseProperty("SensorType")>]
     member val Sensors = HashSet<Sensors>() :> ICollection<_> with get, set
