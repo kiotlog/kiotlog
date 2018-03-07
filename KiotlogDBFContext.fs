@@ -27,19 +27,14 @@ open KiotlogDBF.Models
 open KiotlogDBF.Json
 
 // https://stackoverflow.com/questions/5423768/c-sharp-to-f-ef-code-first
+// https://stackoverflow.com/questions/26775760/how-to-create-a-virtual-record-field-for-entity-framework-lazy-loading
+
 type KiotlogDBFContext (dbContextOptions: DbContextOptions<KiotlogDBFContext>) =
     inherit DbContext (dbContextOptions)
 
-    // https://stackoverflow.com/questions/26775760/how-to-create-a-virtual-record-field-for-entity-framework-lazy-loading
     [<DefaultValue>] val mutable private devices : DbSet<Devices>
     abstract member Devices : DbSet<Devices> with get, set
     override this.Devices with get() = this.devices and set(value) = this.devices <- value
-
-    // abstract member Devices : DbSet<Devices> with get, set
-    // default val Devices = DbContext.Set<Devices>() with get, set
-
-    // [<DefaultValue>] val mutable devices : DbSet<Devices>
-    // member public this.Devices with get() = this.devices and set(value) = this.devices <- value
 
     [<DefaultValue>] val mutable private points : DbSet<Points>
     abstract Points : DbSet<Points> with get, set
@@ -185,7 +180,7 @@ type KiotlogDBFContext (dbContextOptions: DbContextOptions<KiotlogDBFContext>) =
         modelBuilder.Entity<Conversions>(
             fun entity ->
                 entity.ToTable("conversions") |> ignore
-                entity.HasKey(fun c -> c.Id :> obj).HasName("convertions_pkey") |> ignore
+                entity.HasKey(fun c -> c.Id :> obj).HasName("conversions_pkey") |> ignore
                 entity.Property(fun c -> c.Id)
                     .HasColumnName("id")
                     .HasDefaultValueSql("gen_random_uuid()")  |> ignore

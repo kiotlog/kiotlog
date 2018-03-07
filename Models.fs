@@ -37,11 +37,9 @@ type Devices () =
     member val Points = HashSet<Points>() with get, set
     member val Sensors = HashSet<Sensors>() with get, set
 
-    override this.ToString() =
-        toJsonString this
-
-    static member public ShouldSerializePoints () = false
+    member public _this.ShouldSerializePoints () = false
     member public this.ShouldSerializeSensors () = not (Seq.isEmpty this.Sensors)
+    override this.ToString() = toJsonString this
 
 and [<AllowNullLiteral>]
     Points () =
@@ -54,40 +52,36 @@ and [<AllowNullLiteral>]
 
     member val Device : Devices = null with get, set
 
-    override this.ToString() =
-        toJsonString this
+    override this.ToString() = toJsonString this
 
 and [<AllowNullLiteral>]
     Sensors() =
 
     member val Id = Guid.Empty with get, set
-    member val Meta : SensorsMeta = null with get, set
-    member val Fmt : SensorsFmt = null with get, set
     member val DeviceId = Guid.Empty with get, set
     member val SensorTypeId = Guid.Empty with get, set
     member val ConversionId = Guid.Empty with get, set
+    member val Meta : SensorsMeta = null with get, set
+    member val Fmt : SensorsFmt = null with get, set
 
     member val Device : Devices = null with get, set
     member val SensorType : SensorTypes = null with get, set
     member val Conversion : Conversions = null with get, set
 
-    override this.ToString() =
-        toJsonString this
+    override this.ToString() = toJsonString this
 
 and [<AllowNullLiteral>]
     SensorTypes() =
 
-    member val Meta : SensorTypesMeta = null with get, set
     member val Id = Guid.Empty with get, set
     member val Name = String.Empty with get, set
     member val Kind = String.Empty with get, set
+    member val Meta : SensorTypesMeta = null with get, set
 
     member val Sensors = HashSet<Sensors>() with get, set
 
-    static member public ShouldSerializeSensors () = false
-
-    override this.ToString() =
-        toJsonString this
+    member public _this.ShouldSerializeSensors () = false
+    override this.ToString() = toJsonString this
 
 and [<AllowNullLiteral>]
     Conversions() =
@@ -97,4 +91,4 @@ and [<AllowNullLiteral>]
 
     member val Sensors = HashSet<Sensors>() with get, set
 
-    static member public ShouldSerializeSensors () = false
+    member public _this.ShouldSerializeSensors () = false
