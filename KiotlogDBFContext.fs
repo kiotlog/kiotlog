@@ -21,23 +21,14 @@
 namespace KiotlogDBF.Context
 
 open System.Collections.Generic
+open Microsoft.EntityFrameworkCore
 
 open KiotlogDBF.Models
 open KiotlogDBF.Json
-open Microsoft.EntityFrameworkCore
-// open Microsoft.EntityFrameworkCore.Storage.Converters
-// open Newtonsoft.Json
-
 
 // https://stackoverflow.com/questions/5423768/c-sharp-to-f-ef-code-first
 type KiotlogDBFContext (dbContextOptions: DbContextOptions<KiotlogDBFContext>) =
     inherit DbContext (dbContextOptions)
-
-    // let jsonConverter<'T> =
-    //     new ValueConverter<'T, string> (
-    //         (fun m -> JsonConvert.SerializeObject(m :> obj)),
-    //         (fun j -> JsonConvert.DeserializeObject<'T>(j))
-    //     )
 
     // https://stackoverflow.com/questions/26775760/how-to-create-a-virtual-record-field-for-entity-framework-lazy-loading
     [<DefaultValue>] val mutable private devices : DbSet<Devices>
@@ -74,32 +65,58 @@ type KiotlogDBFContext (dbContextOptions: DbContextOptions<KiotlogDBFContext>) =
 
         modelBuilder.Entity<Devices>(
             fun entity ->
-                entity.HasKey(fun d -> d.Id :> obj).HasName("devices_pkey") |> ignore
-                entity.HasIndex(fun d -> d.Device :> obj).HasName("devices_device_key").IsUnique |> ignore
-                entity.Property(fun d -> d.Id).HasDefaultValueSql("gen_random_uuid()") |> ignore
-                // entity.Property(fun d -> d._Meta).HasDefaultValueSql("'{}'::jsonb") |> ignore
+                entity.ToTable("devices") |> ignore
+                entity.HasKey(fun d -> d.Id :> obj)
+                    .HasName("devices_pkey") |> ignore
+                entity.HasIndex(fun d -> d.Device :> obj)
+                    .HasName("devices_device_key").IsUnique |> ignore
+                entity.Property(fun d -> d.Id)
+                    .HasColumnName("id")
+                    .HasDefaultValueSql("gen_random_uuid()") |> ignore
+                entity.Property(fun d -> d.Device)
+                    .HasColumnName("device")
+                    .IsRequired()
+                    .HasDefaultValueSql("device") |> ignore
                 entity.Property(fun d -> d.Meta)
+                    .HasColumnName("meta")
+                    .HasColumnType("jsonb")
                     .HasConversion(jsonConverter<DevicesMeta>)
                     .HasDefaultValueSql("'{}'::jsonb") |> ignore
                 entity.Property(fun d -> d.Auth)
+                    .HasColumnName("auth")
+                    .HasColumnType("jsonb")
                     .HasConversion(jsonConverter<DevicesAuth>)
                     .HasDefaultValueSql("json_build_object('klsn', json_build_object('key', encode(gen_random_bytes(32), 'base64')), 'basic', json_build_object('token', encode(gen_random_bytes(32), 'base64')))") |> ignore
                 entity.Property(fun d -> d.Frame)
+                    .HasColumnName("frame")
+                    .HasColumnType("jsonb")
                     .HasConversion(jsonConverter<DevicesFrame>)
-                    .HasDefaultValueSql("'{\"bigendian\": true, \"bitfields\": false}'::jsonb") |> ignore
-                // entity.Property(fun d -> d._Auth).HasDefaultValueSql("json_build_object('klsn', json_build_object('key', encode(gen_random_bytes(32), 'base64')), 'basic', json_build_object('token', encode(gen_random_bytes(32), 'base64')))") |> ignore
-                // entity.Property(fun d -> d._Frame).HasDefaultValueSql("'{\"bigendian\": true, \"bitfields\": false}'::jsonb") |> ignore
+                    .HasDefaultValueSql(""" '{"bigendian": true, "bitfields": false}'::jsonb """) |> ignore
         ) |> ignore
 
         modelBuilder.Entity<Points>(
             fun entity ->
+                entity.ToTable("points") |> ignore
                 entity.HasKey(fun p -> p.Id :> obj).HasName("points_pkey") |> ignore
-                entity.Property(fun p -> p.Id).HasDefaultValueSql("gen_random_uuid()") |> ignore
-                entity.Property(fun p -> p.Data).HasDefaultValueSql("'{}'::jsonb") |> ignore
-                entity.Property(fun p -> p.Flags).HasDefaultValueSql("'{}'::jsonb") |> ignore
-                entity.Property(fun p -> p.Time).HasDefaultValueSql("now()") |> ignore
+                entity.Property(fun p -> p.Id)
+                    .HasColumnName("id")
+                    .HasDefaultValueSql("gen_random_uuid()") |> ignore
+                entity.Property(fun p -> p.Data)
+                    .HasColumnName("data")
+                    .HasColumnType("jsonb")
+                    .IsRequired()
+                    .HasDefaultValueSql("'{}'::jsonb") |> ignore
+                entity.Property(fun p -> p.Flags)
+                    .HasColumnName("flags")
+                    .HasColumnType("jsonb")
+                    .IsRequired()
+                    .HasDefaultValueSql("'{}'::jsonb") |> ignore
+                entity.Property(fun p -> p.Time)
+                    .HasColumnName("time")                
+                    .HasDefaultValueSql("now()") |> ignore
+                entity.Property("DeviceId").HasColumnName("device_id") |> ignore                
                 entity.HasOne(fun p -> p.Device)
-                    .WithMany(fun (d : Devices) -> d.Points :> IEnumerable<Points>)
+                    .WithMany(fun (d : Devices) -> d.Points :> IEnumerable<_>)
                     .HasForeignKey(fun (p : Points) -> p.DeviceId :> obj)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("points_device_fkey")
@@ -108,43 +125,72 @@ type KiotlogDBFContext (dbContextOptions: DbContextOptions<KiotlogDBFContext>) =
 
         modelBuilder.Entity<Sensors>(
             fun entity ->
+                entity.ToTable("sensors") |> ignore
                 entity.HasKey(fun s -> s.Id :> obj).HasName("sensors_pkey") |> ignore
-                entity.Property(fun s -> s.Id).HasDefaultValueSql("gen_random_uuid()")  |> ignore
+                entity.Property(fun s -> s.Id)
+                    .HasColumnName("id")
+                    .HasDefaultValueSql("gen_random_uuid()")  |> ignore
                 entity.Property(fun s -> s.Fmt)
+                    .HasColumnName("fmt")
+                    .HasColumnType("jsonb")                    
                     .HasConversion(jsonConverter<SensorsFmt>)
                     .HasDefaultValueSql("'{}'::jsonb")  |> ignore
                 entity.Property(fun s -> s.Meta)
+                    .HasColumnName("meta")
+                    .HasColumnType("jsonb")
                     .HasConversion(jsonConverter<SensorsMeta>)                    
                     .HasDefaultValueSql("'{}'::jsonb")  |> ignore
+                entity.Property("DeviceId")
+                    .HasColumnName("device_id")
+                    .HasColumnType("uuid") |> ignore                
                 entity.HasOne(fun s -> s.Device)
-                    .WithMany(fun (d : Devices) -> d.Sensors :> IEnumerable<Sensors>)
+                    .WithMany(fun (d : Devices) -> d.Sensors :> IEnumerable<_>)
                     .HasForeignKey(fun (s : Sensors) -> s.DeviceId :> obj)
                     .HasConstraintName("sensors_device_id_fkey") |> ignore
+                entity.Property("SensorTypeId").HasColumnName("sensor_type_id") |> ignore                
                 entity.HasOne(fun s -> s.SensorType)
-                    .WithMany(fun (t : SensorTypes) -> t.Sensors :> IEnumerable<Sensors>)
+                    .WithMany(fun (t : SensorTypes) -> t.Sensors :> IEnumerable<_>)
                     .HasForeignKey(fun (s: Sensors) -> s.SensorTypeId :> obj)
                     .HasConstraintName("sensors_sensor_type_fkey")  |> ignore
+                entity.Property("ConversionId").HasColumnName("conversion_id") |> ignore                
                 entity.HasOne(fun s -> s.Conversion)
-                    .WithMany(fun (c : Conversions) -> c.Sensors :> IEnumerable<Sensors>)
+                    .WithMany(fun (c : Conversions) -> c.Sensors :> IEnumerable<_>)
                     .HasForeignKey(fun (s : Sensors) -> s.ConversionId :> obj)
                     .HasConstraintName("sensors_conversion_fkey") |> ignore
             ) |> ignore
 
         modelBuilder.Entity<SensorTypes>(
             fun entity ->
+                entity.ToTable("sensor_types") |> ignore
                 entity.HasKey(fun t -> t.Id :> obj).HasName("sensor_types_pkey") |> ignore
                 entity.HasIndex(fun t -> t.Name :> obj).HasName("sensor_types_name_key").IsUnique()  |> ignore
-                entity.Property(fun t -> t.Id).HasDefaultValueSql("gen_random_uuid()")  |> ignore
+                entity.Property(fun t -> t.Id)
+                    .HasColumnName("id")
+                    .HasDefaultValueSql("gen_random_uuid()")  |> ignore
                 entity.Property(fun t -> t.Meta)
+                    .HasColumnName("meta")
+                    .HasColumnType("jsonb")
                     .HasConversion(jsonConverter<SensorTypesMeta>)                
                     .HasDefaultValueSql("'{}'::jsonb")  |> ignore
-                entity.Property(fun t -> t.Name).HasDefaultValueSql("'generic'::text") |> ignore
-                entity.Property(fun t -> t.Kind).HasDefaultValueSql("'generic'::text") |> ignore
+                entity.Property(fun t -> t.Name)
+                    .HasColumnName("name")
+                    .IsRequired()                    
+                    .HasDefaultValueSql("'generic'::text") |> ignore
+                entity.Property(fun t -> t.Kind)
+                    .HasColumnName("kind")
+                    .IsRequired()                    
+                    .HasDefaultValueSql("'generic'::text") |> ignore
         ) |> ignore
 
         modelBuilder.Entity<Conversions>(
             fun entity ->
+                entity.ToTable("conversions") |> ignore
                 entity.HasKey(fun c -> c.Id :> obj).HasName("convertions_pkey") |> ignore
-                entity.Property(fun c -> c.Id).HasDefaultValueSql("gen_random_uuid()")  |> ignore
-                entity.Property(fun c -> c.Fun).HasDefaultValueSql("'id'::text") |> ignore
+                entity.Property(fun c -> c.Id)
+                    .HasColumnName("id")
+                    .HasDefaultValueSql("gen_random_uuid()")  |> ignore
+                entity.Property(fun c -> c.Fun)
+                    .HasColumnName("fun")
+                    .IsRequired()
+                    .HasDefaultValueSql("'id'::text") |> ignore
         ) |> ignore
