@@ -58,11 +58,11 @@ module Klsn =
                 sprintf "/%s/%s/%s" channel app device
 
             let message, nonce, data, time, payload =
-                        x.Msg.Value |> hexStringFromByteArray,
-                        x.Packet.Value.Nonce |> hexStringFromByteArray,
-                        x.Packet.Value.Data |> hexStringFromByteArray,
-                        x.Time.Value.ToString("o"),
-                        x.Payload.Value |> Convert.ToBase64String
+                x.Msg.Value |> hexStringFromByteArray,
+                x.Packet.Value.Nonce |> hexStringFromByteArray,
+                x.Packet.Value.Data |> hexStringFromByteArray,
+                x.Time.Value.ToString("o"),
+                x.Payload.Value |> Convert.ToBase64String
 
             let msg =
                 match what with
