@@ -23,6 +23,7 @@ namespace KiotlogDBF
 open System
 open System.IO
 open Microsoft.FSharp.Reflection
+open Microsoft.EntityFrameworkCore.Storage.Converters
 
 open Newtonsoft.Json
 open Newtonsoft.Json.Serialization
@@ -221,3 +222,9 @@ module Json =
         match isNull value with
         | true -> null
         | false -> JsonConvert.SerializeObject(value)
+
+    let jsonConverter<'T> =
+        new ValueConverter<'T, string> (
+            (fun m -> JsonConvert.SerializeObject(m, snakeSettings) ),
+            (fun j -> JsonConvert.DeserializeObject<'T>(j, snakeSettings))
+        )    
