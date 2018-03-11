@@ -13,7 +13,7 @@ RUN dotnet restore
 # RUN dotnet publish -c Release -r linux-x64 -o out /p:ShowLinkerSizeComparison=true
 WORKDIR /Sln/${PROJECT}
 # RUN dotnet publish -c Release -r linux-x64 -o out /p:LinkDuringPublish=false /p:ShowLinkerSizeComparison=true
-RUN dotnet publish -c Release --no-restore -o out /p:LinkDuringPublish=false /p:ShowLinkerSizeComparison=true
+RUN dotnet publish -c Release -o out /p:LinkDuringPublish=false /p:ShowLinkerSizeComparison=true
 
 # build runtime image
 FROM microsoft/dotnet-nightly:2.1-runtime-alpine

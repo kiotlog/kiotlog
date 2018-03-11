@@ -22,15 +22,17 @@ RUN dotnet add package ILLink.Tasks -v 0.1.4-preview-981901 -s https://dotnet.my
 RUN dotnet publish -c Release -r linux-x64 -o out /p:LinkDuringPublish=true /p:ShowLinkerSizeComparison=true
 
 # build runtime image
-FROM debian:stretch-slim
-
+FROM microsoft/dotnet:2.0-runtime-deps AS runtime
 
 WORKDIR /App
 
 RUN set -ef \
     && apt update \
     && apt install -y --no-install-recommends \
-        libicu57 libcurl3 libunwind8 libssl1.0 \
+        libicu57 \
+        libcurl3 \
+        libunwind8 \
+        libssl1.0 \
     && rm -rf /var/lib/apt/lists/*
 
 ENV LC_ALL en_US.UTF-8
