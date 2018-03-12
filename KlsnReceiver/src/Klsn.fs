@@ -25,7 +25,8 @@ open Chessie.ErrorHandling
 open Microsoft.EntityFrameworkCore
 
 open Sodium
-open KiotlogDB
+open KiotlogDBF.Context
+open KiotlogDBF.Models
 open Catalog
 open SnPacket
 open Helpers
@@ -83,10 +84,10 @@ module Klsn =
 
     let parseRequest (cs : string) ctx =
 
-        let optionsBuilder = DbContextOptionsBuilder<KiotlogDBContext>()
+        let optionsBuilder = DbContextOptionsBuilder<KiotlogDBFContext>()
         optionsBuilder.UseNpgsql(cs) |> ignore
 
-        use dbCtx = new KiotlogDBContext(optionsBuilder.Options)
+        use dbCtx = new KiotlogDBFContext(optionsBuilder.Options)
 
         let devices = getDevices dbCtx
 

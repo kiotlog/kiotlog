@@ -24,11 +24,12 @@ open System
 open Chessie.ErrorHandling
 open Microsoft.EntityFrameworkCore
 
-open KiotlogDB
+open KiotlogDBF.Context
+open KiotlogDBF.Models
 
 module Catalog =
 
-    let getDevices (dbCtx : KiotlogDBContext)  =
+    let getDevices (dbCtx : KiotlogDBFContext)  =
         dbCtx.Devices
             .Include("Sensors")
             .Include("Sensors.SensorType")
