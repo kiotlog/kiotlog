@@ -27,9 +27,10 @@ open Microsoft.EntityFrameworkCore
 open Sodium
 open KiotlogDBF.Context
 open KiotlogDBF.Models
-open Catalog
-open SnPacket
-open Helpers
+
+open KlsnReceiver.Catalog
+open KlsnReceiver.SnPacket
+open KlsnReceiver.Helpers
 
 module Klsn =
 
