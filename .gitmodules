@@ -1,0 +1,3 @@
+[submodule "libsodium-core"]
+	path = libsodium-core
+	url = git@github.com:manchoz/libsodium-core.git
