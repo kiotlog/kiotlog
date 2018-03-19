@@ -21,8 +21,11 @@
 namespace KlsnReceiver
 
 open System
-open Chessie.ErrorHandling
+open System.Collections.Generic
+
 open Microsoft.EntityFrameworkCore
+
+open Chessie.ErrorHandling
 
 open KiotlogDBF.Context
 open KiotlogDBF.Models
@@ -31,24 +34,26 @@ module Catalog =
 
     let getDevices (dbCtx : KiotlogDBFContext)  =
         dbCtx.Devices
-            .Include("Sensors")
-            .Include("Sensors.SensorType")
-            .Include("Sensors.Conversion")
+            .Include(fun d -> d.Sensors :> IEnumerable<Sensors>)
+                .ThenInclude( fun (s : Sensors) -> s.SensorType)
+            .Include(fun d -> d.Sensors :> IEnumerable<Sensors>)
+                .ThenInclude( fun (s : Sensors) -> s.Conversion)
 
     let getDevice devId (devices : Linq.IQueryable<Devices>)  =
         try
-            query {
-                for d in devices do
-                where (d.Device = devId)
-                select d
-                exactlyOne
-            } |> ok
+            // query {
+            //     for d in devices do
+            //     where (d.Device = devId)
+            //     select d
+            //     exactlyOne
+            // } |> ok
 
-            // devices.SingleAsync(fun d -> d.Device = devId)
-            // |> Async.AwaitTask
-            // |> Async.RunSynchronously
-            // |> ok
+            devices.SingleAsync(fun d -> d.Device = devId)
+            |> Async.AwaitTask
+            |> Async.RunSynchronously
+            |> ok
         with
+            | :? AggregateException
             | :? InvalidOperationException as ex ->
                 sprintf "Device %s not found. [%s]" devId ex.Message
                 |> fail
