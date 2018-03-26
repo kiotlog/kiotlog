@@ -2,6 +2,13 @@
 
 ## Running Kiotlog plaform
 
+### Clone repo
+
+Clone this repository and move in
+
+    $ git clone https://github.com/kiotlog/kiotlog
+    $ cd kiotlog
+
 ### Build microservices
 
 Use provided `docker-compose.yml` to build Kiotlog microservices Docker images:
@@ -17,7 +24,9 @@ In order to run the Kiotlog platform, you need at least pre-configured instances
 1.  Build Kiotlog microservices as per previous paragraphs.
 2.  Change to upper directory and pull Kiotlog [Dockerfiles](https://github.com/kiotlog/dockerfiles).
 
-        $ git pull https://github.com/kiotlog/dockerfiles
+        $ cd ..
+        $ git clone https://github.com/kiotlog/dockerfiles
+        $ cd dockerfiles
 
 3. Follow istructions at [Dockerfiles/Readme.md](https://github.com/kiotlog/dockerfiles) to create the Kiotlog deploying environment.
 
