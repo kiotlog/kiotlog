@@ -6,7 +6,7 @@
 
 Clone this repository and move in
 
-    $ git clone https://github.com/kiotlog/kiotlog
+    $ git clone --recurse-submodule https://github.com/kiotlog/kiotlog
     $ cd kiotlog
 
 ### Build microservices
