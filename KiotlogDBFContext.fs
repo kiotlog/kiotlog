@@ -171,8 +171,8 @@ type KiotlogDBFContext (dbContextOptions: DbContextOptions<KiotlogDBFContext>) =
                     .HasColumnName("name")
                     .IsRequired()                    
                     .HasDefaultValueSql("'generic'::text") |> ignore
-                entity.Property(fun t -> t.Kind)
-                    .HasColumnName("kind")
+                entity.Property(fun t -> t.Type)
+                    .HasColumnName("type")
                     .IsRequired()                    
                     .HasDefaultValueSql("'generic'::text") |> ignore
         ) |> ignore
@@ -180,7 +180,7 @@ type KiotlogDBFContext (dbContextOptions: DbContextOptions<KiotlogDBFContext>) =
         modelBuilder.Entity<Conversions>(
             fun entity ->
                 entity.ToTable("conversions") |> ignore
-                entity.HasKey(fun c -> c.Id :> obj).HasName("conversions_pkey") |> ignore
+                entity.HasKey(fun c -> c.Id :> obj).HasName("convertions_pkey") |> ignore
                 entity.Property(fun c -> c.Id)
                     .HasColumnName("id")
                     .HasDefaultValueSql("gen_random_uuid()")  |> ignore
