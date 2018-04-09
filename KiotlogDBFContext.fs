@@ -176,8 +176,8 @@ type KiotlogDBFContext (dbContextOptions: DbContextOptions<KiotlogDBFContext>) =
                     .HasColumnName("name")
                     .IsRequired()                    
                     .HasDefaultValueSql("'generic'::text") |> ignore
-                entity.Property(fun t -> t.Kind)
-                    .HasColumnName("kind")
+                entity.Property(fun t -> t.Type)
+                    .HasColumnName("type")
                     .IsRequired()                    
                     .HasDefaultValueSql("'generic'::text") |> ignore
         ) |> ignore

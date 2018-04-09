@@ -80,7 +80,7 @@ and [<AllowNullLiteral>]
     member val Meta : SensorTypesMeta = null with get, set
     member val Id = Guid.Empty with get, set
     member val Name = String.Empty with get, set
-    member val Kind = String.Empty with get, set
+    member val Type = String.Empty with get, set
 
     member val Sensors = HashSet<Sensors>() with get, set
 
