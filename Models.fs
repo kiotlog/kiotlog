@@ -92,3 +92,32 @@ and [<AllowNullLiteral>]
     member val Sensors = HashSet<Sensors>() with get, set
 
     member public _this.ShouldSerializeSensors () = false
+    
+[<AllowNullLiteral>]
+type Users() =
+    
+    member val Id = Guid.Empty with get, set
+    member val Username = String.Empty with get, set
+    member val Meta : UserMeta = null with get, set
+    member val Auth : UserAuth = null with get, set
+    
+    member val TenantUsers = HashSet<TenantUsers>() with get, set
+    
+and [<AllowNullLiteral>]
+    Tenants() =
+    
+    member val Id = Guid.Empty with get, set
+    member val Tenant = String.Empty with get, set
+    member val Meta : TenantMeta = null with get, set
+
+    member val TenantUsers = HashSet<TenantUsers>() with get, set
+
+and [<AllowNullLiteral>]
+    TenantUsers() =
+    
+    member val Id = Guid.Empty with get, set
+    member val TenantId = Guid.Empty with get, set
+    member val UserId = Guid.Empty with get, set
+    
+    member val User : Users = null with get, set
+    member val Tenant : Tenants = null with get, set
