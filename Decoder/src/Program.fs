@@ -22,12 +22,15 @@ namespace Decoder
 
 open System.Threading
 
+open Microsoft.EntityFrameworkCore
+open KiotlogDBF.Context
+
 open uPLibrary.Networking.M2Mqtt.Messages
 
-open Arguments
-open Mqtt
-open Decoder
-open Catalog
+open Decoder.Arguments
+open Decoder.Mqtt
+open Decoder.Decoder
+open Decoder.Catalog
 
 module Program =
 
@@ -35,11 +38,17 @@ module Program =
     let main argv =
         let mainConfig = parseCLI argv
 
+        let options =
+            DbContextOptionsBuilder<KiotlogDBFContext>()
+                .UseNpgsql(mainConfig.PostgresConnectionString, fun options ->
+                    options.EnableRetryOnFailure() |> ignore)
+                .Options
+
         let decodePayload =
-            decodePayload mainConfig.PostgresConnectionString
+            decodePayload options
 
         let writePoint =
-            writePoint mainConfig.PostgresConnectionString
+            writePoint options
 
         let mqttTopics, mqttQosLevels =
             mainConfig.Topics |> List.toArray,

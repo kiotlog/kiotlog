@@ -94,16 +94,12 @@ module Catalog =
 
         validateFmtString device
 
-    let writePoint (cs : string) (ctx : Context, _) =
+    let writePoint options (ctx : Context, _) =
 
         let _, _, device = ctx.TopicParts.Value
 
-        let optionsBuilder = DbContextOptionsBuilder<KiotlogDBFContext>()
-        optionsBuilder.UseNpgsql(cs) |> ignore
+        use dbCtx = new KiotlogDBFContext(options)
 
-        use dbCtx = new KiotlogDBFContext(optionsBuilder.Options)
-
-        // TODO: check if device was not found
         let devId =
             query {
                 for d in dbCtx.Devices do
