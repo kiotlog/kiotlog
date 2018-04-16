@@ -49,6 +49,9 @@ module Catalog =
             | :? InvalidOperationException as ex ->
                 sprintf "Device %s not found. [%s]" devId ex.Message
                 |> fail
+            | ex ->
+                sprintf "Unable to connect to DB [%s] [%s]" devId ex.Message
+                |> fail
 
     let getSortedSensors (device : Devices) =
         try
