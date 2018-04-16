@@ -52,6 +52,18 @@ type KiotlogDBFContext (dbContextOptions: DbContextOptions<KiotlogDBFContext>) =
     abstract Conversions : DbSet<Conversions> with get, set
     override this.Conversions with get() = this.conversions and set(value) = this.conversions <- value
 
+    [<DefaultValue>] val mutable users : DbSet<Users>
+    abstract Users : DbSet<Users> with get, set
+    override this.Users with get() = this.users and set(value) = this.users <- value
+
+    [<DefaultValue>] val mutable tenants : DbSet<Tenants>
+    abstract Tenants : DbSet<Tenants> with get, set
+    override this.Tenants with get() = this.tenants and set(value) = this.tenants <- value
+
+    [<DefaultValue>] val mutable tenantusers : DbSet<TenantUsers>
+    abstract TenantUsers : DbSet<TenantUsers> with get, set
+    override this.TenantUsers with get() = this.tenantusers and set(value) = this.tenantusers <- value
+
     override __.OnConfiguring(optionsBuilder: DbContextOptionsBuilder) =
         if not optionsBuilder.IsConfigured then () else ()
 
@@ -193,4 +205,81 @@ type KiotlogDBFContext (dbContextOptions: DbContextOptions<KiotlogDBFContext>) =
                     .HasColumnName("fun")
                     .IsRequired()
                     .HasDefaultValueSql("'id'::text") |> ignore
+        ) |> ignore
+        
+        modelBuilder.Entity<Users>(
+            fun entity ->
+                entity.ToTable("users") |> ignore
+                entity.HasKey(fun u -> u.Id :> obj).HasName("users_pkey") |> ignore
+                entity.HasAlternateKey(fun u -> u.Username :> obj) |> ignore
+                entity.Property(fun u -> u.Id)
+                    .HasColumnName("id")
+                    .HasDefaultValueSql("gen_random_uuid()") |> ignore
+                entity.Property(fun u -> u.Username :> obj)
+                    .HasColumnName("username")
+                    .IsRequired()
+                    .HasDefaultValue() |> ignore
+                entity.Property(fun u -> u.Meta :> obj)
+                    .HasColumnName("meta")
+                    .HasColumnType("jsonb")
+                    .HasDefaultValueSql("'{}'::jsonb")
+                    .HasConversion(jsonConverter<UserMeta>) |> ignore
+                entity.Property(fun u -> u.Auth :> obj)
+                    .HasColumnName("auth")
+                    .HasColumnType("jsonb")
+                    .HasDefaultValueSql("json_build_object('passwd', encode(gen_random_bytes(32), 'base64'))")
+                    .HasConversion(jsonConverter<UserAuth>) |> ignore
+                    
+        ) |> ignore
+        
+        modelBuilder.Entity<Tenants>(
+            fun entity ->
+                entity.ToTable("tenants") |> ignore
+
+                entity.HasKey(fun t -> t.Id :> obj).HasName("tenants_pkey") |> ignore
+                entity.Property(fun t -> t.Id)
+                    .HasColumnName("id")
+                    .HasDefaultValueSql("gen_random_uuid()") |> ignore
+
+                entity.HasAlternateKey(fun t -> t.Tenant :> obj) |> ignore
+                entity.Property(fun t -> t.Tenant :> obj)
+                    .HasColumnName("tenant")
+                    .IsRequired()
+                    .HasDefaultValue() |> ignore
+
+                entity.Property(fun t -> t.Meta :> obj)
+                    .HasColumnName("meta")
+                    .HasColumnType("jsonb")
+                    .HasDefaultValueSql("'{}'::jsonb")
+                    .HasConversion(jsonConverter<TenantMeta>) |> ignore
+                    
+        ) |> ignore
+        
+        modelBuilder.Entity<TenantUsers>(
+            fun entity ->
+                entity.ToTable("tenant_users") |> ignore
+
+                entity.HasKey(fun tu -> tu.Id :> obj).HasName("tenant_users_pkey") |> ignore
+                entity.Property(fun t -> t.Id)
+                    .HasColumnName("id")
+                    .HasDefaultValueSql("gen_random_uuid()") |> ignore
+                
+                entity.Property(fun tu -> tu.TenantId :> obj)
+                    .HasColumnName("tenant_id")
+                    .HasColumnType("uuid")
+                    .HasDefaultValueSql("gen_random_uuid()") |> ignore
+                entity.HasOne(fun tu -> tu.Tenant)
+                    .WithMany(fun (t : Tenants) -> t.TenantUsers :> IEnumerable<_>)
+                    .HasForeignKey(fun (tu : TenantUsers) -> tu.TenantId :> obj)
+                    .HasConstraintName("tenant_users_tenant_id_fkey") |> ignore
+                
+                entity.Property(fun tu -> tu.UserId :> obj)
+                    .HasColumnName("user_id")
+                    .HasColumnType("uuid")
+                    .HasDefaultValueSql("gen_random_uuid()") |> ignore
+                entity.HasOne(fun u -> u.User)
+                    .WithMany(fun (u : Users) -> u.TenantUsers :> IEnumerable<_>)
+                    .HasForeignKey(fun (tu : TenantUsers) -> tu.UserId :> obj)
+                    .HasConstraintName("tenant_users_user_id_fkey") |> ignore
+                
         ) |> ignore

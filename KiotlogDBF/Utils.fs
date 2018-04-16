@@ -23,7 +23,7 @@ namespace KiotlogDBF
 open System
 open System.IO
 open Microsoft.FSharp.Reflection
-open Microsoft.EntityFrameworkCore.Storage.Converters
+open Microsoft.EntityFrameworkCore.Storage.ValueConversion
 
 open Newtonsoft.Json
 open Newtonsoft.Json.Serialization
@@ -227,4 +227,4 @@ module Json =
         new ValueConverter<'T, string> (
             (fun m -> JsonConvert.SerializeObject(m, snakeSettings) ),
             (fun j -> JsonConvert.DeserializeObject<'T>(j, snakeSettings))
-        )    
+        )
