@@ -20,18 +20,14 @@
 
 namespace HttpReceiver
 
-open Microsoft.EntityFrameworkCore
 open KiotlogDBF.Context
 open KiotlogDBF.Models
 
 module Catalog =
 
-    let getDeviceBasicAuth (cs : string) devid tkn =
+    let getDeviceBasicAuth dbContextOptions devid tkn =
 
-        let optionsBuilder = DbContextOptionsBuilder<KiotlogDBFContext>()
-        optionsBuilder.UseNpgsql(cs) |> ignore
-
-        use dbCtx = new KiotlogDBFContext(optionsBuilder.Options)
+        use dbCtx = new KiotlogDBFContext(dbContextOptions)
 
         let devices =
             query {

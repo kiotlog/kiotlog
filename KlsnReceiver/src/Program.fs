@@ -23,12 +23,15 @@ namespace KlsnReceiver
 open System
 open System.Threading
 
+open Microsoft.EntityFrameworkCore
+open KiotlogDBF.Context
+
 open uPLibrary.Networking.M2Mqtt.Messages
 
-open Arguments
-open Mqtt
-open Klsn
-open Writer
+open KlsnReceiver.Arguments
+open KlsnReceiver.Mqtt
+open KlsnReceiver.Klsn
+open KlsnReceiver.Writer
 
 module Program =
 
@@ -36,6 +39,11 @@ module Program =
     let main argv =
 
         let mainConfig = parseCLI argv
+
+        let dbContextOptions =
+            DbContextOptionsBuilder<KiotlogDBFContext>()
+                .UseNpgsql(mainConfig.PostgresConnectionString)
+                .Options
 
         let mqttTopics, mqttQosLevels =
             mainConfig.Topics |> List.toArray,
@@ -53,7 +61,7 @@ module Program =
             mqttPublish mqttClient
 
         let parseRequest =
-            parseRequest mainConfig.PostgresConnectionString
+            parseRequest dbContextOptions
 
         let writeRequest =
             writePacket mqttPublish

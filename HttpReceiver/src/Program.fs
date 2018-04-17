@@ -20,16 +20,19 @@
 
 module HttpReceiver.Program
 
-open Suave
-open Operators
-open Filters
+open Microsoft.EntityFrameworkCore
+open KiotlogDBF.Context
 
-open Catalog
-open HttpAuth
-open WebParts
-open MQTT
-open CliArguments
-open Helpers
+open Suave
+open Suave.Operators
+open Suave.Filters
+
+open HttpReceiver.Catalog
+open HttpReceiver.HttpAuth
+open HttpReceiver.WebParts
+open HttpReceiver.MQTT
+open HttpReceiver.CliArguments
+open HttpReceiver.Helpers
 
 [<EntryPoint>]
 let main argv =
@@ -63,8 +66,13 @@ let main argv =
             ]
         ]
 
+    let dbContextOptions =
+        DbContextOptionsBuilder<KiotlogDBFContext>()
+            .UseNpgsql(mainConfig.PostgresConnectionString)
+            .Options
+
     let getDeviceBasicAuth =
-        getDeviceBasicAuth mainConfig.PostgresConnectionString
+        getDeviceBasicAuth dbContextOptions
 
     let checkToken =
         checkToken getDeviceBasicAuth
