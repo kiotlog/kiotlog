@@ -49,22 +49,31 @@ module Request =
         with | :? JsonException -> fail "Invalid JSON"
 
     let validateMeta ctx =
-        try
-            let flags = ctx.Request.Value.["metadata"].ToString(Formatting.None)
-            ok { ctx with Flags = Some flags }
-        with | :? NullReferenceException -> fail "Metadata not found"
+        let flags =
+            try
+                ctx.Request.Value.["metadata"].ToString(Formatting.None) |> Some
+            with | :? NullReferenceException -> None
+
+        ok { ctx with Flags = flags }
 
     let validateTime ctx =
-        try
-            let time = ctx.Request.Value.["metadata"].["time"] |> string
-            let channel, _, _ = ctx.TopicParts.Value
-            let dateTime =
-                match channel with
-                | "sigfox" | "klsn" -> unixTimeStampToDateTime(int64 time)
-                | "lorawan" -> DateTime.Parse(time).ToUniversalTime()
-                | _ -> DateTime.UtcNow
-            ok { ctx with Datetime = Some dateTime}
-        with | _ -> fail "Invalid time"
+        let dateTime =
+            match ctx.Flags with
+            | Some _ ->
+                let time = ctx.Request.Value.["metadata"].["time"] |> string
+                let channel, _, _ = ctx.TopicParts.Value
+
+                match String.IsNullOrEmpty time, channel with
+                | false, "sigfox" | false, "klsn" -> unixTimeStampToDateTime(int64 time)
+                | false, "lorawan" ->
+                    try
+                        DateTime.Parse(time).ToUniversalTime()
+                    with
+                    | :? FormatException -> DateTime.UtcNow
+                | _, _ -> DateTime.UtcNow
+            | None -> DateTime.UtcNow
+
+        ok { ctx with Datetime = Some dateTime}
 
     let validatePayloadRaw ctx =
         try

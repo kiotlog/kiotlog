@@ -111,7 +111,7 @@ module Catalog =
         Points (
             DeviceId = devId,
             Time = ctx.Datetime.Value,
-            Flags = ctx.Flags.Value,
+            Flags = (match ctx.Flags with | Some f -> f | None -> null),
             Data = ctx.Data.Value )
         |> dbCtx.Points.Add |> ignore
 
