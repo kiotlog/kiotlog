@@ -23,8 +23,6 @@ namespace Decoder
 open System
 open System.Collections.Generic
 
-open Microsoft.EntityFrameworkCore
-
 open Newtonsoft.Json
 open Chessie.ErrorHandling
 
