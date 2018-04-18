@@ -1,3 +1,6 @@
 [submodule "libsodium-core"]
 	path = libsodium-core
 	url = https://github.com/manchoz/libsodium-core.git
+[submodule "KiotlogDBF"]
+	path = KiotlogDBF
+	url = https://github.com/kiotlog/kiotlogdbf.git

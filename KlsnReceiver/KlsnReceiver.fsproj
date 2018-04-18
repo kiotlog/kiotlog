@@ -5,7 +5,7 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\libsodium-core\src\Sodium.Core\Sodium.Core.csproj" />
-    <ProjectReference Include="..\KiotlogDBF\KiotlogDBF.fsproj" />
+    <ProjectReference Include="..\KiotlogDBF\KiotlogDBF\KiotlogDBF.fsproj" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="src/Helpers.fs" />

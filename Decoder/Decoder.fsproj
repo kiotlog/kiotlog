@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\KiotlogDBF\KiotlogDBF.fsproj" />
+    <ProjectReference Include="..\KiotlogDBF\KiotlogDBF\KiotlogDBF.fsproj" />
   </ItemGroup>
 
   <ItemGroup>

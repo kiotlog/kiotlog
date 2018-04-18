@@ -28,6 +28,6 @@
     <PackageReference Include="Suave" Version="2.3.0-beta3" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\KiotlogDBF\KiotlogDBF.fsproj" />
+    <ProjectReference Include="..\KiotlogDBF\KiotlogDBF\KiotlogDBF.fsproj" />
   </ItemGroup>
 </Project>
