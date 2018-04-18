@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/kiotlog/kiotlog.svg?branch=master)](https://travis-ci.org/kiotlog/kiotlog)
+
 # Kiotlog Platform Microservices
 
 ## Running Kiotlog plaform
