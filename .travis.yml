@@ -12,4 +12,8 @@ script:
   - dotnet build
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
   - docker build -t kiotlog/decoder -f Decoder/Dockerfile .
+  - docker build -t kiotlog/httpreceiver -f HttpReceiver/Dockerfile .
+  - docker build -t kiotlog/klsnreceiver -f KlsnReceiver/Dockerfile .
   - docker push kiotlog/decoder:latest
+  - docker push kiotlog/httpreceiver:latest
+  - docker push kiotlog/klsnreceiver:latest
