@@ -1,4 +1,4 @@
-FROM microsoft/dotnet:2.0-sdk AS build-env
+FROM microsoft/dotnet:2.1-sdk AS build-env
 WORKDIR /Sln
 
 # COPY nuget.config ./

@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\libsodium-core\src\Sodium.Core\Sodium.Core.csproj" />
@@ -20,12 +20,12 @@
   <ItemGroup>
     <PackageReference Include="FSharp.Core" Version="4.3.4" />
     <PackageReference Include="Chessie" Version="0.6.0" />
-    <PackageReference Include="MessagePack" Version="1.7.3.2" />
+    <PackageReference Include="MessagePack" Version="1.7.3.4" />
     <PackageReference Include="MessagePack.FSharpExtensions" Version="1.4.0" />
-    <PackageReference Include="Argu" Version="4.2.1" />
+    <PackageReference Include="Argu" Version="5.1.0" />
     <PackageReference Include="m2mqttdotnetcore" Version="1.0.7" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.1.0-preview2-final" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.1.0" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
-    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="2.1.0-preview2" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="2.1.0" />
   </ItemGroup>
 </Project>
