@@ -10,13 +10,13 @@ WORKDIR /Sln
 COPY . .
 RUN dotnet restore
 
-WORKDIR /Sln/HttpReceiver
-RUN dotnet publish -c Release -r linux-arm -o out
+WORKDIR /Sln/Decoder
+RUN dotnet publish -c Release -r linux-arm64 -o out
 
 # build runtime image
-FROM arm32v7/debian:stretch-slim
+FROM aarch64/debian:stretch-slim
 
-COPY --from=build-env /usr/bin/qemu-arm-static /usr/bin/qemu-arm-static
+COPY --from=build-env /usr/bin/qemu-aarch64-static /usr/bin/qemu-aarch64-static
 
 WORKDIR /App
 
@@ -26,9 +26,9 @@ RUN set -ef \
         libicu57 libcurl3 libunwind8 libssl1.0 \
     && rm -rf /var/lib/apt/lists/*
 
-COPY --from=build-env /Sln/HttpReceiver/out ./
+COPY --from=build-env /Sln/Decoder/out ./
 
 ENV LC_ALL en_US.UTF-8
 ENV LANG en_US.UTF-8
 
-ENTRYPOINT ["/App/HttpReceiver" ]
+ENTRYPOINT ["/App/Decoder"]
