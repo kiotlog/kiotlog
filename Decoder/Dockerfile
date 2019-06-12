@@ -11,9 +11,9 @@ ARG PROJECT=Decoder
 #######################################################
 # RUN dotnet publish -c Release -r linux-x64 -o out /p:ShowLinkerSizeComparison=true
 WORKDIR /Sln/${PROJECT}
-RUN dotnet add package ILLink.Tasks -v 0.1.5-preview-1461378 -s https://dotnet.myget.org/F/dotnet-core/api/v3/index.json
-# RUN dotnet add package ILLink.Tasks -v 0.1.4-preview-981901 -s https://dotnet.myget.org/F/dotnet-core/api/v3/index.json
-RUN dotnet publish -c Release -r linux-x64 -o out /p:LinkDuringPublish=true /p:ShowLinkerSizeComparison=true
+# RUN dotnet add package ILLink.Tasks -v 0.1.5-preview-1461378 -s https://dotnet.myget.org/F/dotnet-core/api/v3/index.json
+# RUN dotnet publish -c Release -r linux-x64 -o out /p:LinkDuringPublish=true /p:ShowLinkerSizeComparison=true
+RUN dotnet publish -c Release -r linux-x64 -o out
 
 # build runtime image
 FROM debian:stretch-slim
