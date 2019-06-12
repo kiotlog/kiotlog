@@ -61,7 +61,7 @@ module Decoder =
         let min = sensor.SensorType.Meta.Min
         let fn = sensor.Conversion.Fun
 
-        klConvert (field.ToFloat()) max min fn
+        klConvert (field.ToDouble()) max min fn
 
     let private convertMeasures sensors payload =
         match payload with

@@ -22,6 +22,16 @@ namespace Decoder
 
 module Conversions =
 
+    let int32ToFloat (value : float) (max : int) (min : int) : float =
+        let conversionFactor = float ((1 <<< 31) - 1) / float (max - min)
+
+        float value / conversionFactor
+
+    let uint32ToFloat (value : float) (max : int) (min : int) : float =
+        let conversionFactor = float ((1 <<< 32) - 1) / float (max - min)
+
+        float value / conversionFactor
+
     let int16ToFloat (value : float) (max : int) (min : int) : float =
         let conversionFactor = float ((1 <<< 15) - 1) / float (max - min)
 
@@ -42,16 +52,27 @@ module Conversions =
 
         float value / conversionFactor
 
+    let signIntNToFloat (sign: bool) (N: int) (value : float) (max : int) (min : int) : float =
+        let bits = if sign then N - 1 else N
+        let conversionFactor = float ((1 <<< bits) - 1) / float (max - min)
+
+        float value / conversionFactor
+
     let xMul mul (value : float) (_ : int) (_ : int) : float =
         float value / mul
 
     let inline klConvert value max min fn =
         match fn with
-        | "float_to_int16" -> int16ToFloat value max min
-        | "float_to_uint16" -> uint16ToFloat value max min
-        | "float_to_int8" -> int8ToFloat value max min
-        | "float_to_uint8" -> uint8ToFloat value max min
-        | "x10" -> xMul 10. value max min
-        | "x100" -> xMul 100. value max min
-        | "x1000" -> xMul 1000. value max min
+        | "float_to_int32"  -> int32ToFloat    value max min
+        | "float_to_uint32" -> uint32ToFloat   value max min
+        | "float_to_int16"  -> int16ToFloat    value max min
+        | "float_to_uint16" -> uint16ToFloat   value max min
+        | "float_to_int8"   -> int8ToFloat     value max min
+        | "float_to_uint8"  -> uint8ToFloat    value max min
+        | "x10"             -> xMul        10. value max min
+        | "x100"            -> xMul       100. value max min
+        | "x1000"           -> xMul     1_000. value max min
+        | "x10000"          -> xMul    10_000. value max min
+        | "x100000"         -> xMul   100_000. value max min
+        | "x1000000"        -> xMul 1_000_000. value max min
         | _ -> float value

@@ -29,14 +29,16 @@ open Chessie.ErrorHandling
 module PackedValue =
 
     type PackedValue =
-        | S8 of sbyte
-        | U8 of byte
+        | S8  of sbyte
+        | U8  of byte
         | S16 of int16
         | U16 of uint16
         | S32 of int32
         | U32 of uint32
         | S64 of int64
         | U64 of uint64
+        | F32 of single
+        | F64 of double
 
     let toSByte x =
         match x with
@@ -51,15 +53,15 @@ module PackedValue =
     let toInt16 x =
         match x with
         | S16 value -> value
-        | S8 value -> int16 value
-        | U8 value -> int16 value
+        | S8 value  -> int16 value
+        | U8 value  -> int16 value
         | _ -> failwith "Value of incompatible type"
 
     let toUInt16 x =
         match x with
         | U16 value -> value
-        | S8 value -> uint16 value
-        | U8 value -> uint16 value
+        | S8 value  -> uint16 value
+        | U8 value  -> uint16 value
         | _ -> failwith "Value of incompatible type"
 
     let toInt32 x =
@@ -67,8 +69,8 @@ module PackedValue =
         | S32 value -> value
         | S16 value -> int32 value
         | U16 value -> int32 value
-        | S8 value -> int32 value
-        | U8 value -> int32 value
+        | S8 value  -> int32 value
+        | U8 value  -> int32 value
         | _ -> failwith "Value of incompatible type"
 
     let toUInt32 x =
@@ -76,8 +78,8 @@ module PackedValue =
         | U32 value -> value
         | S16 value -> uint32 value
         | U16 value -> uint32 value
-        | S8 value -> uint32 value
-        | U8 value -> uint32 value
+        | S8 value  -> uint32 value
+        | U8 value  -> uint32 value
         | _ -> failwith "Value of incompatible type"
 
     let toInt64 x =
@@ -87,8 +89,8 @@ module PackedValue =
         | U32 value -> int64 value
         | S16 value -> int64 value
         | U16 value -> int64 value
-        | S8 value -> int64 value
-        | U8 value -> int64 value
+        | S8 value  -> int64 value
+        | U8 value  -> int64 value
         | _ -> failwith "Value of incompatible type"
 
     let toUInt64 x =
@@ -98,30 +100,53 @@ module PackedValue =
         | U32 value -> uint64 value
         | S16 value -> uint64 value
         | U16 value -> uint64 value
-        | S8 value -> uint64 value
-        | U8 value -> uint64 value
+        | S8 value  -> uint64 value
+        | U8 value  -> uint64 value
         | _ -> failwith "Value of incompatible type"
 
-    let toFloat x =
+    let toSingle x =
         match x with
+        | F32 value -> value
+        | S64 value -> single value
+        | U64 value -> single value
+        | S32 value -> single value
+        | U32 value -> single value
+        | S16 value -> single value
+        | U16 value -> single value
+        | S8 value  -> single value
+        | U8 value  -> single value
+        | _ -> failwith "Value of incompatible type"
+
+    let toDouble x =
+        match x with
+        | F64 value -> value
+        | F32 value -> float value
         | S64 value -> float value
         | U64 value -> float value
         | S32 value -> float value
         | U32 value -> float value
         | S16 value -> float value
         | U16 value -> float value
-        | S8 value -> float value
-        | U8 value -> float value
+        | S8 value  -> float value
+        | U8 value  -> float value
 
     let adjustEndianNess x =
         match x with
         | S8 _ | U8 _ -> x
-        | S16 value -> value |> IPAddress.NetworkToHostOrder |> S16
+(*      | S16 value -> value |>          IPAddress.NetworkToHostOrder           |> S16
         | U16 value -> value |> int16 |> IPAddress.NetworkToHostOrder |> uint16 |> U16
-        | S32 value -> value |> IPAddress.NetworkToHostOrder |> S32
+        | S32 value -> value |>          IPAddress.NetworkToHostOrder           |> S32
         | U32 value -> value |> int32 |> IPAddress.NetworkToHostOrder |> uint32 |> U32
-        | S64 value -> value |> IPAddress.NetworkToHostOrder |> S64
-        | U64 value -> value |> int64 |> IPAddress.NetworkToHostOrder |> uint64 |> U64
+        | S64 value -> value |>          IPAddress.NetworkToHostOrder           |> S64
+        | U64 value -> value |> int64 |> IPAddress.NetworkToHostOrder |> uint64 |> U64 *)
+        | S16 value -> value |> BitConverter.GetBytes |> Array.rev |> fun bytes -> BitConverter.ToInt16  (bytes, 0) |> S16
+        | U16 value -> value |> BitConverter.GetBytes |> Array.rev |> fun bytes -> BitConverter.ToUInt16 (bytes, 0) |> U16
+        | S32 value -> value |> BitConverter.GetBytes |> Array.rev |> fun bytes -> BitConverter.ToInt32  (bytes, 0) |> S32
+        | U32 value -> value |> BitConverter.GetBytes |> Array.rev |> fun bytes -> BitConverter.ToUInt32 (bytes, 0) |> U32
+        | S64 value -> value |> BitConverter.GetBytes |> Array.rev |> fun bytes -> BitConverter.ToInt64  (bytes, 0) |> S64
+        | U64 value -> value |> BitConverter.GetBytes |> Array.rev |> fun bytes -> BitConverter.ToUInt64 (bytes, 0) |> U64
+        | F32 value -> value |> BitConverter.GetBytes |> Array.rev |> fun bytes -> BitConverter.ToSingle (bytes, 0) |> F32
+        | F64 value -> value |> BitConverter.GetBytes |> Array.rev |> fun bytes -> BitConverter.ToDouble (bytes, 0) |> F64
 
     type PackedValue with
         member x.ToSByte () = toSByte x
@@ -132,7 +157,8 @@ module PackedValue =
         member x.ToUInt32 () = toUInt32 x
         member x.ToInt64 () = toInt64 x
         member x.ToUInt64 () = toUInt64 x
-        member x.ToFloat () = toFloat x
+        member x.ToSingle () = toSingle x
+        member x.ToDouble () = toDouble x
         member x.AdjustEndianNess () = adjustEndianNess x
         // https://stackoverflow.com/questions/5312182/conversion-between-types-in-discriminated-unions
 
@@ -157,9 +183,9 @@ module Struct =
         // TODO: Check for empty format string
 
         let (|Digit|_|) (ch : char) =
-           let mutable intvalue = 0
-           if System.Int32.TryParse(string ch, &intvalue) then Some(intvalue)
-           else None
+           match ch |> string |> System.Int32.TryParse with
+           | true, value -> Some(value)
+           | _ -> None
 
         let (|Character|_|) (ch: char) =
             match ch with
@@ -167,6 +193,7 @@ module Struct =
             | 'b' | 'B'
             | 'h' | 'H'
             | 'i' | 'I' | 'l' | 'L'
+            | 'f' | 'd'
             | 'q' | 'Q' -> Some ch
             | _ -> None
 
@@ -187,7 +214,9 @@ module Struct =
                 | Some accu -> // repetitions -> replicate character
                     repetitions := None // reset accumulator
                     List.replicate accu (string c)
-            | _ -> failwith "Invalid Format Character"
+            | x ->
+                eprintf "Invalid Format Character: '%c'" x
+                [] // not a digit nor a character -> skip
 
         Seq.toList
         >> List.collect parseFormatAtom
@@ -229,27 +258,31 @@ module Struct =
 
     let private readAtom (streamReader : BinaryReader) =
         function
-        | "b" -> S8 <| streamReader.ReadSByte()
-        | "B" -> U8 <| streamReader.ReadByte()
-        | "h" -> S16 <| streamReader.ReadInt16()
-        | "H" -> U16 <| streamReader.ReadUInt16()
+        | "b" ->       S8  <| streamReader.ReadSByte()
+        | "B" ->       U8  <| streamReader.ReadByte()
+        | "h" ->       S16 <| streamReader.ReadInt16()
+        | "H" ->       U16 <| streamReader.ReadUInt16()
         | "i" | "l" -> S32 <| streamReader.ReadInt32()
         | "I" | "L" -> U32 <| streamReader.ReadUInt32()
-        | "q" -> S64 <| streamReader.ReadInt64()
-        | "Q" -> U64 <| streamReader.ReadUInt64()
+        | "f" ->       F32 <| streamReader.ReadSingle()
+        | "d" ->       F64 <| streamReader.ReadDouble()
+        | "q" ->       S64 <| streamReader.ReadInt64()
+        | "Q" ->       U64 <| streamReader.ReadUInt64()
         |  _  -> failwith "Unknow Format Character"
 
     let calcsize fmt =
         let sizeOfAtom =
             function
-            | "b" -> sizeof<sbyte>
-            | "B" -> sizeof<byte>
-            | "h" -> sizeof<int16>
-            | "H" -> sizeof<uint16>
+            | "b"       -> sizeof<sbyte>
+            | "B"       -> sizeof<byte>
+            | "h"       -> sizeof<int16>
+            | "H"       -> sizeof<uint16>
             | "i" | "l" -> sizeof<int32>
             | "I" | "L" -> sizeof<uint32>
-            | "q" -> sizeof<int64>
-            | "Q" -> sizeof<uint64>
+            | "f"       -> sizeof<single>
+            | "d"       -> sizeof<double>
+            | "q"       -> sizeof<int64>
+            | "Q"       -> sizeof<uint64>
             |  _ -> 0
 
         fmt
