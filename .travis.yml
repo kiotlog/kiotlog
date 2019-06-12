@@ -1,19 +1,20 @@
 sudo: required
 services:
-  - docker
+- docker
 language: csharp
 solution: Kiotlog.sln
 mono: none
 dotnet: 2.1
 env:
   global:
-    secure: UIht8NFnqh92z6NlpyflRk/7Wgz+q6YdkcA7YfuxFzr+RQkMbv3U7NK191hrm2vOkAmhX3zHtnds+DviDyg3/vF9PQa5McaXYHZuhNTCoPlh4RU34efmzK8uMOto2F2voZK1saIvLzFksBavc/+tUjsvFiQoF5MhnwxCQBYrps5gRf7GRJBYoeTs2vMlnbVqre348lS7tFvOhlyu6bp+KKwjqXGG6Z3nOphMQ/yj2YEfDPTAwMF5IeX6+iZFMIVs/NuuN9RP0FDoU/gFqCTISr+NQxMR8dEuiahWH5vEY/Fv7yKNYAgKU/52HKz5mhEU93xDVNC/LYgs7A3sVUiz8amzzOscxn3hsLMhf62EUKO1I4wLAKxRUiGXhc1+cawOAv1OL4jxJyF/rmKue+KcAq5EQedXOhHeBzTJ2P2abW8YF6wTHayrgw22AUTdwFE2q9DZ4Yq5kyxj1Ek7sSjtqAEeZzA/s653+bVxafw0vO8z6FoTqtgZduJWJWrrJGlDxLRQ+VGeithSOweCPSj8sRpPY3Pa2UxaYBTl9WEMhiJLqoQOZorEenVQS7ZTMLkNUcYQ1EIx9D+WWjiaI1LeS+G2/ppE2bLXw4SIzClpKSk7Szqla7COmoYLWmMeyCphyXBdecY3AiPoZwjXBNvMJgODvTSkeFnN3Fx6NA9zVs4=
+  - secure: XX8c2tq9Uh17ZoNX6/L/7sdVQMpP3M3d5IfbP5VPcgA5w6VuJkZAqCCBc//Qzrb/85zhiGI0CqPNt6Agsb98kixrdbPDmiHZPGud9ctmXpRUzfEfJbI8GpxpYLy4gqwZZhgAmx8yo1Nw7YnJz6ivMQ5vgHKkiR1K/SPNUbggqjba1yG/7xdos+a299Sh1hbNjCr7mK5KBYCykvoXwrjIcKbg2xv9wQBsJ0uQqdMTqt8NdGwS9Zm5EbYnRcgiSP2cnAQsmJdoJ0BRPJjlsDJZUaApJvsqhLAbGRFCAL3c2LERZWZxYOtz2AnmfJsD7I3TdVSZnwfmpKJQ5DNeoVrwkfkBg7e4F5jLBcUsK3M8xScoMXuh5FgnulWHC4klC9YP0myAIIVJQ4lTvMXIhAnsWfcyc3Se30QEQtTVE6p+NHBCS21sengynUHdm7wDOD3uMlOMJAnhIrpXJOpP0D9YVmw9ivIv+Sz4lCyErXghWMFS4ErGnVQIIJb/D37lBd6lYaPWO/3lV5Kd2HSEO3EC1LhdiD+T6BE7QdEHN5y/m+lYMzDVNhBrOD7in9RBzQR2gfI6l3W95FnUDfi+EZfvmLAFtT39UI37C5h9s3gSU3bJSTTW56GUMrMKLiQ4fMzhGq+lWPHnpo/BzLRA7aKLJWcO30Wa80d1egJoKFJ6dvw=
+  - secure: 5p33F8QqqGfAfhs02QqBcGXfVBVv3msqtP8CHhNetYxsCrcVehWnFbruTBPne2iuW6AceTacQFGWJ5T+j+5B0d89qe15WKfDp3eVgZnljTNd3mGUiJqcuGBgJzuaDEeDNTF6hztSqJBHQTcGphpgkqVOjT4lwM+PcehKLFqheIU5VBYUqi8dfIrAh5rw3GeIUs+BtF2mqG24Afe4Zbr9KxxH3oj+VRSwx+MjFTfmv2VP/3ZEJdhAo+caRwig+XRQpRxDKMkvW43G3OyHz3EWN8T0fo1uuUEAF2W9oICiwGVF/9E2Hr7VBrmu/m2PNx/wARmFse2qzvBULSTwEbWRQ1J3taTvooPgSNf3f+GhNh14WzISM3yySWMRmISihR1ZJ8QLePAu5jfM1n/TOa35puFihOzxncJmH8pan61ZiiRX4bbgR2itTjPmHSsXYdyvGEphmJ9t+6T+8SUiThyuylrS9SrzRFBvY8yt7wJBXHUy2G/O3S9aHrb3QXqFQFaM+KnTpvcGOx/MUbmub+kXlsc1PVRx19RIkHxixB5AoZ0gpSAGYNgGrBts+IGfLUl7HC7KQadhI93NvOg1S1dNGb8r5D/BOKlAIYPmVonkgVPz7hR8WQiS+TiQj4NFprcchHPKI4j/duWS7GL45UdZ56gIlTie7BBT2UVrUBsYvFw=
 script:
-  - dotnet build
-  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-  - docker build -t kiotlog/decoder -f Decoder/Dockerfile .
-  - docker build -t kiotlog/httpreceiver -f HttpReceiver/Dockerfile .
-  - docker build -t kiotlog/klsnreceiver -f KlsnReceiver/Dockerfile .
-  - docker push kiotlog/decoder:latest
-  - docker push kiotlog/httpreceiver:latest
-  - docker push kiotlog/klsnreceiver:latest
+- dotnet build
+- echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+- docker build -t kiotlog/decoder -f Decoder/Dockerfile .
+- docker build -t kiotlog/httpreceiver -f HttpReceiver/Dockerfile .
+- docker build -t kiotlog/klsnreceiver -f KlsnReceiver/Dockerfile .
+- docker push kiotlog/decoder:latest
+- docker push kiotlog/httpreceiver:latest
+- docker push kiotlog/klsnreceiver:latest
