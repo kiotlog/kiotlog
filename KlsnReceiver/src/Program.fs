@@ -49,6 +49,8 @@ module Program =
             mainConfig.Topics |> List.toArray,
             [| for _ in mainConfig.Topics -> MqttMsgBase.QOS_LEVEL_AT_MOST_ONCE |]
 
+        printfn "Waiting for data on %d topics: %A" mqttTopics.Length mqttTopics
+
         let mqttClientId = "KlsnReceiver/" + Guid.NewGuid().ToString()
 
         let mqttClient =

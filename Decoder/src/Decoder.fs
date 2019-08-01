@@ -53,7 +53,7 @@ module Decoder =
     let private strToByteArray channel =
         match channel with
         | "sigfox" -> byteArrayFromHexString
-        | "lorawan" | "klsn" -> Convert.FromBase64String
+        | "lorawan" | "klsn" | "klsnts" -> Convert.FromBase64String
         | _ -> encode
 
     let private doConvert (field : PackedValue) (sensor : Sensors) =

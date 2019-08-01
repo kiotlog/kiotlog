@@ -101,9 +101,21 @@ module Klsn =
                 | _ -> fail "Key not found"
 
         let parseMsg req =
+            let channel ,_, _ = req.TopicParts.Value
             try
-                let packet = parseSnPacket req.Msg.Value
-                ok { req with Packet = Some packet }
+                match channel with
+                | "klsn" ->
+                    let p = parseSnPacket<SnPacket> req.Msg.Value
+                    { req with Packet = Some p } |> ok
+                | "klsnts" ->
+                    let pts = parseSnPacket<SnPacketTs> req.Msg.Value
+                    let p = { Data = pts.Data; Nonce = pts.Nonce }
+                    let ts = BitConverter.ToInt32(pts.Timestamp, 0) |> int64 |> DateTimeOffset.FromUnixTimeSeconds
+                    { req with
+                        Packet = Some p
+                        Time = Some ts.UtcDateTime
+                    } |> ok
+                | _ -> sprintf "Unknown KLSN Channel %s" channel |> fail
             with
                 | :? InvalidOperationException as ex ->
                     sprintf "MsgPack Deserialization failed : %s" ex.Message |> fail
@@ -115,7 +127,7 @@ module Klsn =
                 req.Key.Value
             try
                 let plain = SecretAeadIETF.Decrypt(data, nonce, key)
-                ok { req with Payload = Some plain }
+                { req with Payload = Some plain } |> ok
             with
                 | _ -> fail "AEAD Failed"
 

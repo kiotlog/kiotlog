@@ -64,7 +64,8 @@ module Request =
                 let channel, _, _ = ctx.TopicParts.Value
 
                 match String.IsNullOrEmpty time, channel with
-                | false, "sigfox" | false, "klsn" -> unixTimeStampToDateTime(int64 time)
+                | false, "sigfox"
+                | false, "klsn" | false, "klsnts" -> unixTimeStampToDateTime(int64 time)
                 | false, "lorawan" ->
                     try
                         DateTime.Parse(time).ToUniversalTime()

@@ -31,6 +31,7 @@ module SnPacket =
         StandardResolver.Instance
     )
 
+    [<CLIMutable>]
     [<MessagePackObject>]
     type SnPacket = {
         [<Key("nonce")>]
@@ -39,5 +40,16 @@ module SnPacket =
         Data: byte []
     }
 
-    let parseSnPacket (msg : byte []) =
-        MessagePackSerializer.Deserialize<SnPacket>(msg)
+    [<CLIMutable>]
+    [<MessagePackObject>]
+    type SnPacketTs = {
+        [<Key("nonce")>]
+        Nonce: byte []
+        [<Key("data")>]
+        Data: byte []
+        [<Key("ts")>]
+        Timestamp: byte []
+    }
+
+    let parseSnPacket<'T> (msg : byte []) : 'T =
+        MessagePackSerializer.Deserialize<'T>(msg)
