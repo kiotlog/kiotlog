@@ -117,6 +117,7 @@ module Klsn =
                     } |> ok
                 | _ -> sprintf "Unknown KLSN Channel %s" channel |> fail
             with
+                | :? IO.EndOfStreamException
                 | :? InvalidOperationException as ex ->
                     sprintf "MsgPack Deserialization failed : %s" ex.Message |> fail
 
