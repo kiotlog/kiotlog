@@ -22,7 +22,7 @@
     <PackageReference Include="Argu" Version="5.4.0" />
     <PackageReference Include="Chessie" Version="0.6.0" />
     <PackageReference Include="M2MqttDotNetCore" Version="1.0.8" />
-    <PackageReference Include="MessagePack" Version="1.7.3.7" />
+    <PackageReference Include="MessagePack" Version="1.9.3" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.2.4" />
     <PackageReference Include="Newtonsoft.JSON" Version="12.0.2" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="2.2.4" />
