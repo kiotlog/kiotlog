@@ -57,7 +57,7 @@ module Program =
             mqttConnect mainConfig.MQTTBroker mqttClientId
 
         let mqttClosed =
-            mqttClosed mqttClient mqttClientId
+            mqttClosed mqttClient mqttClientId (mqttTopics, mqttQosLevels)
 
         let mqttPublish =
             mqttPublish mqttClient

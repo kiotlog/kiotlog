@@ -102,12 +102,15 @@ module Mqtt =
             Thread.Sleep 1000
             mqttConnect (broker, port) clientId
 
-    let rec mqttClosed client clientId e =
+    let rec mqttClosed client clientId subparams e =
         eprintfn "Broker closed connection: trying to reconnect."
         match tryConnect client clientId with
         | Ok _ ->
-            printfn "Connected."
+            eprintfn "Connected."
+            client.Subscribe subparams |> ignore
+            let (mqttTopics, _) = subparams
+            printfn "Rebuscribing to %d topics: %A" mqttTopics.Length mqttTopics
         | Bad msg ->
             eprintfn "Re-opening closed connection failed. Retrying in 1 second. [%A]" msg
             Thread.Sleep 1000
-            mqttClosed client clientId e
+            mqttClosed client clientId subparams e
