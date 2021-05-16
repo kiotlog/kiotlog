@@ -20,16 +20,13 @@
 
 namespace KlsnReceiver
 
+open System
+
 open MessagePack
 open MessagePack.Resolvers
 open MessagePack.FSharp
 
 module SnPacket =
-
-    CompositeResolver.RegisterAndSetAsDefault(
-        FSharpResolver.Instance,
-        StandardResolver.Instance
-    )
 
     [<CLIMutable>]
     [<MessagePackObject>]
@@ -51,5 +48,13 @@ module SnPacket =
         Timestamp: byte []
     }
 
+    let private options =
+        let resolver =
+            Resolvers.CompositeResolver.Create(
+                FSharpResolver.Instance,
+                StandardResolver.Instance
+            )        
+        MessagePackSerializerOptions.Standard.WithResolver(resolver)
+        
     let parseSnPacket<'T> (msg : byte []) : 'T =
-        MessagePackSerializer.Deserialize<'T>(msg)
+        MessagePackSerializer.Deserialize<'T>(ReadOnlyMemory(msg), options)       

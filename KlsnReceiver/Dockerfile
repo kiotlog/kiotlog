@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/core/sdk:3.0 AS build-env
+FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build-env
 WORKDIR /Sln
 
 COPY . .
@@ -9,7 +9,7 @@ WORKDIR /Sln/KlsnReceiver
 RUN dotnet publish -c Release -r linux-x64 -o out
 
 # build runtime image
-FROM mcr.microsoft.com/dotnet/core/runtime-deps:3.0 AS runtime
+FROM mcr.microsoft.com/dotnet/runtime-deps:5.0 AS runtime
 
 WORKDIR /App
 

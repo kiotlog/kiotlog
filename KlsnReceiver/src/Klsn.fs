@@ -127,7 +127,7 @@ module Klsn =
                 req.Packet.Value.Nonce,
                 req.Key.Value
             try
-                let plain = SecretAeadIETF.Decrypt(data, nonce, key)
+                let plain = SecretAeadChaCha20Poly1305IETF.Decrypt(data, nonce, key)
                 { req with Payload = Some plain } |> ok
             with
                 | _ -> fail "AEAD Failed"
