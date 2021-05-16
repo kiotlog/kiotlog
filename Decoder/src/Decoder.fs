@@ -67,7 +67,7 @@ module Decoder =
         match payload with
         | [] -> fail "Empty Payload"
         | _ ->
-            let decodedDict = new Dictionary<string, float>()
+            let decodedDict = Dictionary<string, float>()
             List.iter2
                 (fun (s : Sensors) p ->
                     decodedDict.[s.Meta.Name] <- doConvert p s)

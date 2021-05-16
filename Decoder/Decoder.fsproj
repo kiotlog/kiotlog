@@ -1,14 +1,11 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\KiotlogDBF\KiotlogDBF\KiotlogDBF.fsproj" />
   </ItemGroup>
-
   <ItemGroup>
     <Compile Include="src/Helpers.fs" />
     <Compile Include="src/Struct.fs" />
@@ -19,17 +16,12 @@
     <Compile Include="src/Mqtt.fs" />
     <Compile Include="src/Arguments.fs" />
     <Compile Include="src/Program.fs" />
-    <Content Include="nuget.config" />
-    <Content Include="runtimeconfig.json" />
   </ItemGroup>
-
   <ItemGroup>
-    <PackageReference Include="Argu" Version="6.0.0" />
+    <PackageReference Include="Argu" Version="6.1.1" />
     <PackageReference Include="Chessie" Version="0.6.0" />
-    <PackageReference Include="m2mqttdotnetcore" Version="1.0.8" />
-    <PackageReference Include="MessagePack" Version="1.9.3" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="m2mqttdotnetcore" Version="1.1.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="3.1.1" />
   </ItemGroup>
-
 </Project>
