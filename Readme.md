@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/kiotlog/kiotlog.svg?branch=master)](https://travis-ci.org/kiotlog/kiotlog)
+![Build Solution](https://github.com/kiotlog/kiotlog/actions/workflows/build-solution.yml/badge.svg)
 
 # Kiotlog Platform Microservices
 
