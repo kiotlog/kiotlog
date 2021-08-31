@@ -20,6 +20,7 @@
 
 namespace Decoder
 
+open System
 open System.Threading
 
 open Microsoft.EntityFrameworkCore
@@ -53,13 +54,22 @@ module Program =
         let mqttTopics, mqttQosLevels =
             mainConfig.Topics |> List.toArray,
             [| for _ in mainConfig.Topics -> MqttMsgBase.QOS_LEVEL_AT_MOST_ONCE |]
+        
+        printfn "Waiting for data on %d topics: %A" mqttTopics.Length mqttTopics
 
-        let mqttClient = mqttConnect mainConfig.MQTTBroker
+        let mqttClientId = "KlsnDecoder/" + Guid.NewGuid().ToString()
+
+        let mqttClient =
+            mqttConnect mainConfig.MQTTBroker mqttClientId
+
+        let mqttClosed =
+            mqttClosed mqttClient mqttClientId (mqttTopics, mqttQosLevels)
 
         let msgReceived = msgReceivedHandler decodePayload writePoint
 
         mqttClient.MqttMsgPublishReceived.Add msgReceived
         mqttClient.MqttMsgSubscribed.Add msgSubscribed
+        mqttClient.ConnectionClosed.Add mqttClosed
 
         mqttClient.Subscribe (mqttTopics, mqttQosLevels) |> ignore
 
