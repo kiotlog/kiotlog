@@ -19,7 +19,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Chessie" Version="0.6.0" />
-    <PackageReference Include="MessagePack" Version="2.2.85" />
+    <PackageReference Include="MessagePack" Version="2.5.187" />
     <PackageReference Include="MessagePack.FSharpExtensions" Version="2.1.0" />
     <PackageReference Include="Argu" Version="6.1.1" />
     <PackageReference Include="m2mqttdotnetcore" Version="1.1.0" />
